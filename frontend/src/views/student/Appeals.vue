@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { getStudentAppeals, submitAppeal, getCourseList } from '../../api'
+import { getStudentAppeals, submitAppeal, getCourseList, getStudentScores, getUserList } from '../../api'
 
 export default {
   name: 'StudentAppeals',
@@ -163,6 +163,8 @@ export default {
       pageSize: 10,
       courses: [],
       teachers: [],
+      allTeachers: [],
+      scoreRecords: [],
       dialogVisible: false,
       submitting: false,
       appealForm: {
@@ -220,10 +222,21 @@ export default {
     },
     async fetchCourses() {
       try {
-        const res = await getCourseList({ studentId: this.userId })
-        if (res.data.code === 200) {
-          const data = res.data.data
-          this.courses = Array.isArray(data) ? data : (data.records || data.list || [])
+        const [courseRes, scoreRes, teacherRes] = await Promise.all([
+          getCourseList({ page: 1, size: 1000 }),
+          getStudentScores({ studentId: this.userId }),
+          getUserList({ role: 'TEACHER', page: 1, size: 1000 })
+        ])
+        if (courseRes.data.code === 200) {
+          const data = courseRes.data.data
+          this.courses = data.records || data || []
+        }
+        if (scoreRes.data.code === 200) {
+          this.scoreRecords = scoreRes.data.data || []
+        }
+        if (teacherRes.data.code === 200) {
+          const data = teacherRes.data.data
+          this.allTeachers = data.records || data || []
         }
       } catch (e) {
         console.error('获取课程列表失败', e)
@@ -231,19 +244,13 @@ export default {
     },
     handleDialogCourseChange(courseId) {
       this.appealForm.teacherId = ''
-      const selectedCourse = this.courses.find(c => c.id === courseId)
-      if (selectedCourse && selectedCourse.teachers) {
-        this.teachers = selectedCourse.teachers
-      } else if (selectedCourse && selectedCourse.teacherId) {
-        this.teachers = [{
-          id: selectedCourse.teacherId,
-          realName: selectedCourse.teacherName || '教师',
-          name: selectedCourse.teacherName || '教师'
-        }]
-      } else {
-        this.teachers = []
-      }
-      // Auto-select if only one teacher
+      // 从学生的成绩记录中找到该课程对应的教师
+      const teacherIds = [...new Set(
+        this.scoreRecords
+          .filter(s => s.courseId === courseId)
+          .map(s => s.teacherId)
+      )]
+      this.teachers = this.allTeachers.filter(t => teacherIds.includes(t.id))
       if (this.teachers.length === 1) {
         this.appealForm.teacherId = this.teachers[0].id
       }

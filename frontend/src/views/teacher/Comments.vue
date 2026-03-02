@@ -58,6 +58,19 @@
             ></el-option>
           </el-select>
         </el-col>
+        <el-col :span="6">
+          <div class="filter-label">快捷操作</div>
+          <el-button
+            type="warning"
+            icon="el-icon-s-claim"
+            style="width: 100%"
+            @click="handlePublishAllComments"
+            :loading="publishAllLoading"
+            :disabled="!selectedCourse || !selectedClass || studentList.length === 0"
+          >
+            一键发布全班评语
+          </el-button>
+        </el-col>
       </el-row>
     </div>
 
@@ -173,7 +186,9 @@ import {
 export default {
   name: 'TeacherComments',
   data() {
+    const defaultCommentText = '该生表现良好'
     return {
+      defaultCommentText: defaultCommentText,
       bindings: [],
       courseList: [],
       classList: [],
@@ -181,9 +196,10 @@ export default {
       selectedCourse: null,
       selectedClass: null,
       selectedStudent: null,
-      commentText: '',
+      commentText: defaultCommentText,
       saveLoading: false,
       publishLoading: false,
+      publishAllLoading: false,
       currentComment: {
         id: null,
         isPublished: 0
@@ -282,7 +298,9 @@ export default {
             id: latest.id,
             isPublished: latest.isPublished || 0
           }
-          this.commentText = latest.comment || ''
+          this.commentText = (latest.comment && latest.comment.trim()) ? latest.comment : this.defaultCommentText
+        } else {
+          this.resetComment()
         }
       } catch (e) {
         console.error('Load comment error:', e)
@@ -305,7 +323,7 @@ export default {
       }
     },
     resetComment() {
-      this.commentText = ''
+      this.commentText = this.defaultCommentText
       this.currentComment = { id: null, isPublished: 0 }
     },
     async handleSaveComment() {
@@ -354,6 +372,64 @@ export default {
         this.$message.error('发布失败')
       } finally {
         this.publishLoading = false
+      }
+    },
+    async handlePublishAllComments() {
+      if (!this.selectedCourse || !this.selectedClass) {
+        this.$message.warning('请先选择课程和班级')
+        return
+      }
+      if (!this.studentList.length) {
+        this.$message.warning('当前班级暂无学生')
+        return
+      }
+
+      try {
+        await this.$confirm(
+          `将为当前班级 ${this.studentList.length} 名学生批量发布评语，是否继续？`,
+          '提示',
+          { type: 'warning' }
+        )
+      } catch (e) {
+        return
+      }
+
+      this.publishAllLoading = true
+      try {
+        const teacherId = this.$store.state.userInfo ? this.$store.state.userInfo.id : null
+        const commentMap = new Map()
+        ;(this.commentHistory || []).forEach(item => {
+          if (!commentMap.has(item.studentId)) {
+            commentMap.set(item.studentId, item)
+          }
+        })
+
+        let affected = 0
+        for (const stu of this.studentList) {
+          const existing = commentMap.get(stu.id)
+          const payload = {
+            studentId: stu.id,
+            courseId: this.selectedCourse,
+            teacherId: teacherId,
+            comment: (existing && existing.comment && existing.comment.trim()) ? existing.comment : this.defaultCommentText,
+            isPublished: 1
+          }
+          if (existing && existing.id) {
+            payload.id = existing.id
+          }
+          await saveComment(payload)
+          affected += 1
+        }
+
+        this.$message.success(`已批量发布 ${affected} 名学生评语`)
+        await this.loadCommentHistory()
+        if (this.selectedStudent) {
+          await this.loadExistingComment()
+        }
+      } catch (e) {
+        this.$message.error('批量发布失败')
+      } finally {
+        this.publishAllLoading = false
       }
     },
     getStudentName(studentId) {

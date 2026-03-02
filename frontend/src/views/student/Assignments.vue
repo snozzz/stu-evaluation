@@ -23,8 +23,8 @@
       <el-table-column prop="dueDate" label="截止日期" width="160"></el-table-column>
       <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag size="small" :type="scope.row.submitted ? 'success' : 'danger'">
-            {{ scope.row.submitted ? '已提交' : '未提交' }}
+          <el-tag size="small" :type="statusType(scope.row)">
+            {{ statusText(scope.row) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -39,7 +39,8 @@
       </el-table-column>
       <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
-          <el-button v-if="!scope.row.submitted" type="text" size="small" @click="openSubmitDialog(scope.row)">提交</el-button>
+          <el-button v-if="!scope.row.submitted && !isExpired(scope.row)" type="text" size="small" @click="openSubmitDialog(scope.row)">提交</el-button>
+          <span v-else-if="!scope.row.submitted && isExpired(scope.row)" style="color: #f56c6c;">已截止</span>
           <el-button v-else type="text" size="small" @click="openViewDialog(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
@@ -117,6 +118,21 @@ export default {
     this.loadAssignments() // Load all initially
   },
   methods: {
+    isExpired(row) {
+      if (row.expired != null) return row.expired
+      if (!row.dueDate) return false
+      return new Date(row.dueDate).getTime() < Date.now()
+    },
+    statusText(row) {
+      if (row.submitted) return '已提交'
+      if (this.isExpired(row)) return '已截止'
+      return '未提交'
+    },
+    statusType(row) {
+      if (row.submitted) return 'success'
+      if (this.isExpired(row)) return 'warning'
+      return 'danger'
+    },
     async fetchCourses() {
       try {
         const res = await getCourseList({ studentId: this.userId })
@@ -144,6 +160,10 @@ export default {
       }
     },
     openSubmitDialog(row) {
+      if (this.isExpired(row)) {
+        this.$message.warning('该作业/实验已截止，无法提交')
+        return
+      }
       this.submitForm = {
         assignmentId: row.id,
         content: '',

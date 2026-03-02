@@ -49,6 +49,15 @@ public class AssignmentController {
 
     @PostMapping("/submit")
     public Result<?> submit(@RequestBody AssignmentSubmission submission) {
+        Assignment assignment = assignmentService.getById(submission.getAssignmentId());
+        if (assignment == null) {
+            return Result.error("作业/实验不存在");
+        }
+        Date now = new Date();
+        if (assignment.getDueDate() != null && now.after(assignment.getDueDate())) {
+            return Result.error("已超过截止时间，无法提交");
+        }
+
         submission.setSubmitTime(new Date());
         if (submission.getStatus() == null) {
             submission.setStatus("SUBMITTED");
@@ -96,6 +105,7 @@ public class AssignmentController {
             subMap.put(sub.getAssignmentId(), sub);
         }
 
+        Date now = new Date();
         List<Map<String, Object>> result = new ArrayList<>();
         for (Assignment a : assignments) {
             Map<String, Object> item = new HashMap<>();
@@ -107,6 +117,7 @@ public class AssignmentController {
             item.put("type", a.getType());
             item.put("dueDate", a.getDueDate());
             item.put("createTime", a.getCreateTime());
+            item.put("expired", a.getDueDate() != null && now.after(a.getDueDate()));
             AssignmentSubmission sub = subMap.get(a.getId());
             if (sub != null) {
                 item.put("submitted", true);

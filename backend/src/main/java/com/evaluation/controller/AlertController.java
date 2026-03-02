@@ -8,6 +8,8 @@ import com.evaluation.entity.AssignmentSubmission;
 import com.evaluation.entity.EvalScore;
 import com.evaluation.entity.SelfEvaluation;
 import com.evaluation.entity.Course;
+import com.evaluation.entity.StudentClass;
+import com.evaluation.entity.TeacherCourseClass;
 import com.evaluation.service.AlertRecordService;
 import com.evaluation.service.AlertRuleService;
 import com.evaluation.service.AssignmentService;
@@ -15,12 +17,17 @@ import com.evaluation.service.AssignmentSubmissionService;
 import com.evaluation.service.EvalScoreService;
 import com.evaluation.service.SelfEvaluationService;
 import com.evaluation.service.CourseService;
+import com.evaluation.service.StudentClassService;
+import com.evaluation.service.TeacherCourseClassService;
 import com.evaluation.util.Result;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/alert")
@@ -46,6 +53,12 @@ public class AlertController {
 
     @Resource
     private CourseService courseService;
+
+    @Resource
+    private StudentClassService studentClassService;
+
+    @Resource
+    private TeacherCourseClassService teacherCourseClassService;
 
     @GetMapping("/rules")
     public Result<?> listRules() {
@@ -92,83 +105,157 @@ public class AlertController {
     @GetMapping("/student/{studentId}")
     public Result<?> getStudentAlerts(@PathVariable Long studentId) {
         List<Map<String, Object>> alerts = new ArrayList<>();
+        Date now = new Date();
+        String nowText = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
         try {
-            // 1. Check for overdue unsubmitted assignments
-            List<Assignment> allAssignments = assignmentService.list();
-            LambdaQueryWrapper<AssignmentSubmission> subWrapper = new LambdaQueryWrapper<>();
-            subWrapper.eq(AssignmentSubmission::getStudentId, studentId);
-            List<AssignmentSubmission> submissions = assignmentSubmissionService.list(subWrapper);
-            Set<Long> submittedIds = new HashSet<>();
-            for (AssignmentSubmission sub : submissions) {
-                submittedIds.add(sub.getAssignmentId());
+            List<AlertRule> enabledRules = alertRuleService.list(
+                    new LambdaQueryWrapper<AlertRule>().eq(AlertRule::getIsEnabled, 1)
+            );
+            Map<String, AlertRule> ruleMap = new HashMap<>();
+            for (AlertRule rule : enabledRules) {
+                ruleMap.put(rule.getRuleType(), rule);
             }
 
-            Date now = new Date();
-            for (Assignment a : allAssignments) {
-                if (!submittedIds.contains(a.getId())) {
-                    Map<String, Object> alert = new HashMap<>();
-                    alert.put("type", "MISSING_ASSIGNMENT");
-                    alert.put("message", "作业/实验\"" + a.getTitle() + "\"尚未提交，请及时处理");
-                    alert.put("courseId", a.getCourseId());
-                    alerts.add(alert);
+            List<StudentClass> studentClassLinks = studentClassService.getByStudentId(studentId);
+            Set<Long> studentClassIds = studentClassLinks.stream()
+                    .map(StudentClass::getClassId)
+                    .collect(Collectors.toSet());
+
+            Set<Long> enrolledCourseIds = new HashSet<>();
+            if (!studentClassIds.isEmpty()) {
+                LambdaQueryWrapper<TeacherCourseClass> bindingWrapper = new LambdaQueryWrapper<>();
+                bindingWrapper.in(TeacherCourseClass::getClassId, studentClassIds);
+                List<TeacherCourseClass> bindings = teacherCourseClassService.list(bindingWrapper);
+                for (TeacherCourseClass binding : bindings) {
+                    enrolledCourseIds.add(binding.getCourseId());
                 }
             }
 
-            // 2. Check for missing self evaluations
-            // Assuming student should have self-evaluated all courses they are in
-            // But we need to know what courses the student has. We can get it from their scores or self-evals.
-            // Simplified: let's get the courses from the student's existing scores
             LambdaQueryWrapper<EvalScore> scoreWrapper = new LambdaQueryWrapper<>();
             scoreWrapper.eq(EvalScore::getStudentId, studentId);
             List<EvalScore> studentScores = evalScoreService.list(scoreWrapper);
-
-            Set<Long> courseIds = new HashSet<>();
-            for (EvalScore s : studentScores) {
-                courseIds.add(s.getCourseId());
+            for (EvalScore score : studentScores) {
+                enrolledCourseIds.add(score.getCourseId());
             }
 
-            LambdaQueryWrapper<SelfEvaluation> selfEvalWrapper = new LambdaQueryWrapper<>();
-            selfEvalWrapper.eq(SelfEvaluation::getStudentId, studentId);
-            List<SelfEvaluation> selfEvals = selfEvaluationService.list(selfEvalWrapper);
-            Set<Long> selfEvalCourseIds = new HashSet<>();
-            for (SelfEvaluation se : selfEvals) {
-                selfEvalCourseIds.add(se.getCourseId());
-            }
+            // 1. 作业/实验：仅在截止后且未提交时提醒
+            if (ruleMap.containsKey("HOMEWORK_MISSING") && !enrolledCourseIds.isEmpty()) {
+                LambdaQueryWrapper<AssignmentSubmission> subWrapper = new LambdaQueryWrapper<>();
+                subWrapper.eq(AssignmentSubmission::getStudentId, studentId);
+                List<AssignmentSubmission> submissions = assignmentSubmissionService.list(subWrapper);
+                Set<Long> submittedIds = submissions.stream()
+                        .map(AssignmentSubmission::getAssignmentId)
+                        .collect(Collectors.toSet());
 
-            for (Long cid : courseIds) {
-                if (!selfEvalCourseIds.contains(cid)) {
-                    Course course = courseService.getById(cid);
-                    String courseName = course != null ? course.getName() : "未知课程";
-                    Map<String, Object> alert = new HashMap<>();
-                    alert.put("type", "MISSING_SELF_EVAL");
-                    alert.put("message", "课程\"" + courseName + "\"尚未完成自我评价");
-                    alert.put("courseId", cid);
-                    alerts.add(alert);
+                LambdaQueryWrapper<Assignment> assignmentWrapper = new LambdaQueryWrapper<>();
+                assignmentWrapper.in(Assignment::getCourseId, enrolledCourseIds)
+                        .isNotNull(Assignment::getDueDate);
+                List<Assignment> assignments = assignmentService.list(assignmentWrapper);
+                long seq = 1L;
+                for (Assignment assignment : assignments) {
+                    if (assignment.getDueDate() != null
+                            && now.after(assignment.getDueDate())
+                            && !submittedIds.contains(assignment.getId())) {
+                        Map<String, Object> alert = new HashMap<>();
+                        alert.put("id", seq++);
+                        alert.put("type", "MISSING_ASSIGNMENT");
+                        alert.put("courseId", assignment.getCourseId());
+                        alert.put("message", "作业/实验\"" + assignment.getTitle() + "\"已截止仍未提交，请尽快联系任课老师");
+                        alert.put("createTime", nowText);
+                        alerts.add(alert);
+                    }
                 }
             }
 
-            // 3. Check for low scores compared to class average
+            // 2. 自评未完成提醒
+            if (ruleMap.containsKey("EVAL_DELAY") && !enrolledCourseIds.isEmpty()) {
+                LambdaQueryWrapper<SelfEvaluation> selfEvalWrapper = new LambdaQueryWrapper<>();
+                selfEvalWrapper.eq(SelfEvaluation::getStudentId, studentId)
+                        .in(SelfEvaluation::getCourseId, enrolledCourseIds);
+                List<SelfEvaluation> selfEvals = selfEvaluationService.list(selfEvalWrapper);
+                Map<Long, Set<Long>> selfEvalDimMap = new HashMap<>();
+                for (SelfEvaluation selfEval : selfEvals) {
+                    selfEvalDimMap
+                            .computeIfAbsent(selfEval.getCourseId(), k -> new HashSet<Long>())
+                            .add(selfEval.getDimensionId());
+                }
+                int requiredDimensionCount = (int) studentScores.stream()
+                        .map(EvalScore::getDimensionId)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .count();
+                if (requiredDimensionCount <= 0) {
+                    requiredDimensionCount = 1;
+                }
 
-            // Group by courseId and compute average
-            Map<Long, List<EvalScore>> courseScoreMap = new HashMap<>();
-            for (EvalScore s : studentScores) {
-                courseScoreMap.computeIfAbsent(s.getCourseId(), k -> new ArrayList<>()).add(s);
+                long seq = alerts.size() + 1L;
+                for (Long courseId : enrolledCourseIds) {
+                    int doneCount = selfEvalDimMap.containsKey(courseId) ? selfEvalDimMap.get(courseId).size() : 0;
+                    if (doneCount < requiredDimensionCount) {
+                        Course course = courseService.getById(courseId);
+                        String courseName = course != null ? course.getName() : "未知课程";
+                        Map<String, Object> alert = new HashMap<>();
+                        alert.put("id", seq++);
+                        alert.put("type", "MISSING_SELF_EVAL");
+                        alert.put("courseId", courseId);
+                        alert.put("message", "课程\"" + courseName + "\"自评未完成（" + doneCount + "/" + requiredDimensionCount + "）");
+                        alert.put("createTime", nowText);
+                        alerts.add(alert);
+                    }
+                }
             }
 
-            for (Map.Entry<Long, List<EvalScore>> entry : courseScoreMap.entrySet()) {
-                double avg = entry.getValue().stream()
-                    .mapToDouble(s -> s.getScore() != null ? s.getScore().doubleValue() : 0)
-                    .average().orElse(0);
-                if (avg < 60) {
-                    Course course = courseService.getById(entry.getKey());
-                    String courseName = course != null ? course.getName() : "未知课程";
-                    Map<String, Object> alert = new HashMap<>();
-                    alert.put("type", "LOW_SCORE");
-                    alert.put("message", "课程\"" + courseName + "\"成绩偏低（均分" + String.format("%.1f", avg) + "），建议加强学习");
-                    alert.put("courseId", entry.getKey());
-                    alert.put("courseName", courseName);
-                    alerts.add(alert);
+            // 3. 成绩明显低于班级平均提醒
+            if (ruleMap.containsKey("SCORE_LOW") && !studentScores.isEmpty()) {
+                AlertRule scoreRule = ruleMap.get("SCORE_LOW");
+                double diffThreshold = 10.0;
+                Double absoluteThreshold = null;
+                if (scoreRule != null && scoreRule.getThreshold() != null) {
+                    double threshold = scoreRule.getThreshold().doubleValue();
+                    if (threshold > 0 && threshold <= 30) {
+                        diffThreshold = threshold;
+                    } else if (threshold > 30) {
+                        absoluteThreshold = threshold;
+                    }
+                }
+
+                Map<Long, List<EvalScore>> studentCourseScoreMap = studentScores.stream()
+                        .collect(Collectors.groupingBy(EvalScore::getCourseId));
+                long seq = alerts.size() + 1L;
+                for (Map.Entry<Long, List<EvalScore>> entry : studentCourseScoreMap.entrySet()) {
+                    Long courseId = entry.getKey();
+                    double studentAvg = entry.getValue().stream()
+                            .map(EvalScore::getScore)
+                            .filter(Objects::nonNull)
+                            .mapToDouble(BigDecimal::doubleValue)
+                            .average()
+                            .orElse(0.0);
+                    if (studentAvg <= 0) {
+                        continue;
+                    }
+
+                    List<Long> classmateIds = getClassmatesByCourse(studentId, courseId, studentClassIds);
+                    double classAvg = calculateClassCourseAverage(classmateIds, courseId);
+                    if (classAvg <= 0) {
+                        continue;
+                    }
+
+                    boolean lowerThanClass = classAvg - studentAvg >= diffThreshold;
+                    boolean lowerThanAbsolute = absoluteThreshold != null && studentAvg < absoluteThreshold && studentAvg < classAvg;
+                    if (lowerThanClass || lowerThanAbsolute) {
+                        Course course = courseService.getById(courseId);
+                        String courseName = course != null ? course.getName() : "未知课程";
+                        Map<String, Object> alert = new HashMap<>();
+                        alert.put("id", seq++);
+                        alert.put("type", "LOW_SCORE");
+                        alert.put("courseId", courseId);
+                        alert.put("message", "课程\"" + courseName + "\"成绩偏低（你: "
+                                + String.format("%.1f", studentAvg) + "，班均: "
+                                + String.format("%.1f", classAvg) + "）");
+                        alert.put("createTime", nowText);
+                        alerts.add(alert);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -176,5 +263,64 @@ public class AlertController {
         }
 
         return Result.success(alerts);
+    }
+
+    private List<Long> getClassmatesByCourse(Long studentId, Long courseId, Set<Long> studentClassIds) {
+        Set<Long> targetClassIds = new HashSet<>();
+        if (!studentClassIds.isEmpty()) {
+            LambdaQueryWrapper<TeacherCourseClass> bindingWrapper = new LambdaQueryWrapper<>();
+            bindingWrapper.eq(TeacherCourseClass::getCourseId, courseId)
+                    .in(TeacherCourseClass::getClassId, studentClassIds);
+            List<TeacherCourseClass> bindings = teacherCourseClassService.list(bindingWrapper);
+            for (TeacherCourseClass binding : bindings) {
+                targetClassIds.add(binding.getClassId());
+            }
+        }
+
+        if (targetClassIds.isEmpty() && !studentClassIds.isEmpty()) {
+            targetClassIds.addAll(studentClassIds);
+        }
+
+        if (!targetClassIds.isEmpty()) {
+            LambdaQueryWrapper<StudentClass> classmateWrapper = new LambdaQueryWrapper<>();
+            classmateWrapper.in(StudentClass::getClassId, targetClassIds);
+            List<StudentClass> classmates = studentClassService.list(classmateWrapper);
+            List<Long> ids = classmates.stream()
+                    .map(StudentClass::getStudentId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            if (!ids.isEmpty()) {
+                return ids;
+            }
+        }
+
+        // Fallback: 至少包含自己，避免无班级数据时无法计算
+        return Collections.singletonList(studentId);
+    }
+
+    private double calculateClassCourseAverage(List<Long> studentIds, Long courseId) {
+        if (studentIds == null || studentIds.isEmpty()) {
+            return 0.0;
+        }
+        LambdaQueryWrapper<EvalScore> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EvalScore::getCourseId, courseId)
+                .in(EvalScore::getStudentId, studentIds);
+        List<EvalScore> scores = evalScoreService.list(wrapper);
+        if (scores.isEmpty()) {
+            return 0.0;
+        }
+
+        Map<Long, List<EvalScore>> byStudent = scores.stream()
+                .collect(Collectors.groupingBy(EvalScore::getStudentId));
+        return byStudent.values().stream()
+                .mapToDouble(items -> items.stream()
+                        .map(EvalScore::getScore)
+                        .filter(Objects::nonNull)
+                        .mapToDouble(BigDecimal::doubleValue)
+                        .average()
+                        .orElse(0.0))
+                .filter(v -> v > 0)
+                .average()
+                .orElse(0.0);
     }
 }

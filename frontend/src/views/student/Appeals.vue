@@ -1,7 +1,7 @@
 <template>
   <div class="appeals-container">
     <!-- Header -->
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span>反馈申诉</span>
         <el-button
@@ -18,11 +18,7 @@
       <el-table
         :data="appeals"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="{ background: '#0f172a', color: '#94a3b8', borderColor: '#334155' }"
-        :cell-style="{ background: '#1e293b', color: '#e2e8f0', borderColor: '#334155' }"
         v-loading="loading"
-        element-loading-background="rgba(30, 41, 59, 0.8)"
         empty-text="暂无申诉记录"
       >
         <el-table-column prop="courseName" label="课程" min-width="120">
@@ -84,7 +80,6 @@
           :page-size="pageSize"
           :current-page.sync="currentPage"
           @current-change="fetchAppeals"
-          class="dark-pagination"
         ></el-pagination>
       </div>
     </div>
@@ -94,7 +89,6 @@
       title="提交新申诉"
       :visible.sync="dialogVisible"
       width="560px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
       <el-form :model="appealForm" :rules="formRules" ref="appealFormRef" label-width="80px">
@@ -103,7 +97,6 @@
             v-model="appealForm.courseId"
             placeholder="请选择课程"
             style="width: 100%"
-            class="dialog-select"
             @change="handleDialogCourseChange"
           >
             <el-option
@@ -119,7 +112,6 @@
             v-model="appealForm.teacherId"
             placeholder="请选择教师"
             style="width: 100%"
-            class="dialog-select"
           >
             <el-option
               v-for="teacher in teachers"
@@ -135,7 +127,6 @@
             v-model="appealForm.content"
             :rows="5"
             placeholder="请详细描述你的反馈或申诉内容..."
-            class="dialog-textarea"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -304,28 +295,29 @@ export default {
   /* container */
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #ec4899, #be185d) !important;
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e) !important;
   border: none !important;
   font-size: 13px !important;
 }
@@ -334,38 +326,21 @@ export default {
   opacity: 0.9;
 }
 
-/* Dark Table */
-.dark-table >>> .el-table__empty-text {
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table::before {
-  background-color: #334155;
-}
-
 .content-text {
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .reply-text {
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .no-reply {
-  color: #475569;
+  color: #94a3b8;
   font-style: italic;
 }
 
 .time-text {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 13px;
 }
 
@@ -376,102 +351,19 @@ export default {
   margin-top: 20px;
 }
 
-.dark-pagination >>> .el-pager li {
-  background: #0f172a;
-  color: #94a3b8;
-  border: 1px solid #334155;
-}
-
-.dark-pagination >>> .el-pager li.active {
-  background: #ec4899;
-  color: #fff;
-  border-color: #ec4899;
-}
-
-.dark-pagination >>> .btn-prev,
-.dark-pagination >>> .btn-next {
-  background: #0f172a;
-  color: #94a3b8;
-  border: 1px solid #334155;
-}
-
-/* Dialog */
-.dark-dialog >>> .el-dialog {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-}
-
-.dark-dialog >>> .el-dialog__header {
-  border-bottom: 1px solid #334155;
-  padding: 16px 20px;
-}
-
-.dark-dialog >>> .el-dialog__title {
-  color: #e2e8f0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.dark-dialog >>> .el-dialog__headerbtn .el-dialog__close {
-  color: #94a3b8;
-}
-
-.dark-dialog >>> .el-dialog__headerbtn .el-dialog__close:hover {
-  color: #ec4899;
-}
-
-.dark-dialog >>> .el-dialog__body {
-  padding: 24px 20px;
-}
-
-.dark-dialog >>> .el-dialog__footer {
-  border-top: 1px solid #334155;
-  padding: 12px 20px;
-}
-
-.dark-dialog >>> .el-form-item__label {
-  color: #94a3b8;
-}
-
-.dialog-select >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.dialog-select >>> .el-input__inner:focus {
-  border-color: #ec4899;
-}
-
-.dialog-textarea >>> .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-  resize: vertical;
-}
-
-.dialog-textarea >>> .el-textarea__inner:focus {
-  border-color: #ec4899;
-}
-
-.dialog-textarea >>> .el-textarea__inner::placeholder {
-  color: #475569;
-}
-
 .cancel-btn {
   background: transparent !important;
-  border-color: #334155 !important;
-  color: #94a3b8 !important;
+  border-color: #e5e7eb !important;
+  color: #64748b !important;
 }
 
 .cancel-btn:hover {
-  border-color: #ec4899 !important;
-  color: #ec4899 !important;
+  border-color: #61BFAD !important;
+  color: #61BFAD !important;
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #ec4899, #be185d) !important;
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e) !important;
   border: none !important;
 }
 </style>

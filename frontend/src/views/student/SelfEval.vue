@@ -1,7 +1,7 @@
 <template>
   <div class="self-eval-container">
     <!-- Course Select -->
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span>自我评价</span>
         <el-select
@@ -23,7 +23,7 @@
 
     <!-- Evaluation Form -->
     <div v-if="selectedCourseId && dimensions.length > 0">
-      <div class="dark-card" v-for="(dim, index) in dimensions" :key="dim.id">
+      <div class="light-card" v-for="(dim, index) in dimensions" :key="dim.id">
         <div class="dimension-header">
           <div class="dimension-index">{{ index + 1 }}</div>
           <div class="dimension-info">
@@ -65,7 +65,7 @@
             v-model="evalForm[dim.id].comment"
             :rows="3"
             placeholder="请输入你对该维度的自我评价说明..."
-            class="dark-textarea"
+            class="eval-textarea"
           ></el-input>
         </div>
 
@@ -89,26 +89,16 @@
           保存自评
         </el-button>
       </div>
-
-      <!-- AI Summary Section -->
-      <div class="dark-card ai-section" v-if="aiSummary">
-        <div class="card-header">
-          <span><i class="el-icon-cpu" style="margin-right: 6px;"></i>综合评价总览</span>
-        </div>
-        <div class="ai-summary-box">
-          <div class="ai-summary-content">{{ aiSummary }}</div>
-        </div>
-      </div>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="selectedCourseId && dimensions.length === 0" class="dark-card empty-state">
-      <i class="el-icon-document" style="font-size: 48px; color: #334155;"></i>
+    <div v-else-if="selectedCourseId && dimensions.length === 0" class="light-card empty-state">
+      <i class="el-icon-document" style="font-size: 48px; color: #e5e7eb;"></i>
       <p>该课程暂无评价维度</p>
     </div>
 
-    <div v-else class="dark-card empty-state">
-      <i class="el-icon-edit-outline" style="font-size: 48px; color: #334155;"></i>
+    <div v-else class="light-card empty-state">
+      <i class="el-icon-edit-outline" style="font-size: 48px; color: #e5e7eb;"></i>
       <p>请先选择课程开始自我评价</p>
     </div>
   </div>
@@ -126,8 +116,7 @@ export default {
       dimensions: [],
       evalForm: {},
       existingEvals: {},
-      saving: false,
-      aiSummary: ''
+      saving: false
     }
   },
   computed: {
@@ -153,7 +142,6 @@ export default {
     async handleCourseChange(courseId) {
       this.evalForm = {}
       this.existingEvals = {}
-      this.aiSummary = ''
 
       try {
         const [dimRes, evalRes] = await Promise.all([
@@ -169,10 +157,6 @@ export default {
         if (evalRes.data.code === 200) {
           const ed = evalRes.data.data
           existingList = Array.isArray(ed) ? ed : (ed.records || [])
-          // Extract AI summary if present
-          if (ed && ed.aiSummary) {
-            this.aiSummary = ed.aiSummary
-          }
         }
 
         // Build form
@@ -250,21 +234,22 @@ export default {
   /* container */
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -272,16 +257,6 @@ export default {
 
 .course-select {
   width: 220px;
-}
-
-.course-select >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.course-select >>> .el-input__inner:focus {
-  border-color: #ec4899;
 }
 
 /* Dimension Card */
@@ -295,7 +270,7 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ec4899, #be185d);
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e);
   color: #fff;
   display: flex;
   align-items: center;
@@ -311,7 +286,7 @@ export default {
 }
 
 .dimension-name {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 15px;
   font-weight: 600;
   margin: 0 0 4px 0;
@@ -335,7 +310,7 @@ export default {
 .score-value {
   font-size: 28px;
   font-weight: 700;
-  color: #ec4899;
+  color: #61BFAD;
 }
 
 .score-unit {
@@ -351,7 +326,7 @@ export default {
 
 .form-label {
   display: block;
-  color: #94a3b8;
+  color: #64748b;
   font-size: 13px;
   margin-bottom: 8px;
 }
@@ -366,54 +341,17 @@ export default {
   flex: 1;
 }
 
-.score-slider >>> .el-slider__runway {
-  background-color: #334155;
-}
-
 .score-slider >>> .el-slider__bar {
-  background: linear-gradient(90deg, #ec4899, #f472b6);
+  background: linear-gradient(90deg, #61BFAD, #7ed4c4);
 }
 
 .score-slider >>> .el-slider__button {
-  border-color: #ec4899;
-  background: #ec4899;
+  border-color: #61BFAD;
+  background: #61BFAD;
 }
 
 .score-number {
   width: 120px;
-}
-
-.score-number >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.score-number >>> .el-input-number__decrease,
-.score-number >>> .el-input-number__increase {
-  background: #0f172a;
-  border-color: #334155;
-  color: #94a3b8;
-}
-
-.score-number >>> .el-input-number__decrease:hover,
-.score-number >>> .el-input-number__increase:hover {
-  color: #ec4899;
-}
-
-.dark-textarea >>> .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-  resize: vertical;
-}
-
-.dark-textarea >>> .el-textarea__inner:focus {
-  border-color: #ec4899;
-}
-
-.dark-textarea >>> .el-textarea__inner::placeholder {
-  color: #475569;
 }
 
 /* Existing Eval */
@@ -422,7 +360,7 @@ export default {
   font-size: 12px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px dashed #334155;
+  border-top: 1px dashed #e5e7eb;
 }
 
 .existing-eval i {
@@ -436,7 +374,7 @@ export default {
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #ec4899, #be185d) !important;
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e) !important;
   border: none !important;
   padding: 12px 48px !important;
   font-size: 15px !important;
@@ -446,25 +384,7 @@ export default {
 
 .save-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
-}
-
-/* AI Section */
-.ai-section {
-  border-color: rgba(236, 72, 153, 0.2);
-}
-
-.ai-summary-box {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.06), rgba(139, 92, 246, 0.06));
-  border: 1px solid rgba(236, 72, 153, 0.15);
-  border-radius: 8px;
-  padding: 16px 20px;
-}
-
-.ai-summary-content {
-  color: #cbd5e1;
-  font-size: 14px;
-  line-height: 1.8;
+  box-shadow: 0 4px 15px rgba(97, 191, 173, 0.4);
 }
 
 /* Empty State */

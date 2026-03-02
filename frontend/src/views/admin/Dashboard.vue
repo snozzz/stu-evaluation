@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <!-- Carousel -->
-    <div class="dark-card carousel-card" v-if="carousels.length > 0">
+    <div class="light-card carousel-card" v-if="carousels.length > 0">
       <el-carousel height="280px" :interval="4000" arrow="hover" indicator-position="outside">
         <el-carousel-item v-for="item in carousels" :key="item.id">
           <a :href="item.linkUrl || 'javascript:;'" class="carousel-link">
@@ -15,7 +15,7 @@
     <!-- Stat Cards -->
     <el-row :gutter="20" class="stat-row">
       <el-col :span="6">
-        <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+        <div class="stat-card" style="background: linear-gradient(135deg, #61BFAD, #4da89a);">
           <div class="stat-icon">
             <i class="el-icon-user"></i>
           </div>
@@ -61,7 +61,7 @@
     </el-row>
 
     <!-- Chart Section -->
-    <div class="dark-card chart-card">
+    <div class="light-card chart-card">
       <div class="card-header">
         <span>评价统计</span>
       </div>
@@ -69,7 +69,7 @@
     </div>
 
     <!-- Announcements Section -->
-    <div class="dark-card announcement-card">
+    <div class="light-card announcement-card">
       <div class="card-header">
         <span>最新公告</span>
       </div>
@@ -172,9 +172,9 @@ export default {
         backgroundColor: 'transparent',
         tooltip: {
           trigger: 'axis',
-          backgroundColor: '#1e293b',
-          borderColor: '#334155',
-          textStyle: { color: '#e2e8f0' }
+          backgroundColor: '#ffffff',
+          borderColor: '#e5e7eb',
+          textStyle: { color: '#2c3e50' }
         },
         grid: {
           left: '3%',
@@ -185,14 +185,14 @@ export default {
         xAxis: {
           type: 'category',
           data: courseNames,
-          axisLine: { lineStyle: { color: '#475569' } },
-          axisLabel: { color: '#94a3b8' }
+          axisLine: { lineStyle: { color: '#d1d5db' } },
+          axisLabel: { color: '#64748b' }
         },
         yAxis: {
           type: 'value',
-          axisLine: { lineStyle: { color: '#475569' } },
-          axisLabel: { color: '#94a3b8' },
-          splitLine: { lineStyle: { color: '#334155' } }
+          axisLine: { lineStyle: { color: '#d1d5db' } },
+          axisLabel: { color: '#64748b' },
+          splitLine: { lineStyle: { color: '#e5e7eb' } }
         },
         series: [{
           name: '评价数量',
@@ -201,8 +201,8 @@ export default {
           barWidth: '40%',
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#10b981' },
-              { offset: 1, color: '#059669' }
+              { offset: 0, color: '#61BFAD' },
+              { offset: 1, color: '#4da89a' }
             ]),
             borderRadius: [6, 6, 0, 0]
           }
@@ -263,21 +263,22 @@ export default {
   margin-top: 4px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .chart-card .chart-container {
@@ -296,7 +297,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 14px 0;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   transition: background 0.2s;
 }
 
@@ -305,11 +306,11 @@ export default {
 }
 
 .announcement-item:hover {
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(97, 191, 173, 0.05);
 }
 
 .announcement-title {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 14px;
   flex: 1;
 }
@@ -337,10 +338,10 @@ export default {
   margin-top: -10px;
 }
 .carousel-card >>> .el-carousel__indicator .el-carousel__button {
-  background: #475569;
+  background: #d1d5db;
 }
 .carousel-card >>> .el-carousel__indicator.is-active .el-carousel__button {
-  background: #10b981;
+  background: #61BFAD;
 }
 .carousel-link {
   display: block;

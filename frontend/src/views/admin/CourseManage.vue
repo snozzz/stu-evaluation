@@ -1,13 +1,12 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <!-- Search Bar -->
       <div class="search-bar">
         <el-input
           v-model="keyword"
           placeholder="搜索课程名/课程代码"
           clearable
-          class="dark-input"
           style="width: 250px; margin-right: 12px;"
           @keyup.enter.native="handleSearch"
         >
@@ -21,9 +20,6 @@
       <el-table
         :data="tableData"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="headerCellStyle"
-        :cell-style="cellStyle"
         stripe
       >
         <el-table-column prop="id" label="ID" width="70"></el-table-column>
@@ -37,7 +33,7 @@
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip></el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" style="color: #10b981;" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="text" style="color: #61BFAD;" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" style="color: #ef4444;" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -61,10 +57,9 @@
       :title="dialogType === 'add' ? '新增课程' : '编辑课程'"
       :visible.sync="dialogVisible"
       width="520px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
-      <el-form :model="form" :rules="rules" ref="courseForm" label-width="80px" class="dark-form">
+      <el-form :model="form" :rules="rules" ref="courseForm" label-width="80px">
         <el-form-item label="课程名" prop="name">
           <el-input v-model="form.name" placeholder="请输入课程名"></el-input>
         </el-form-item>
@@ -119,16 +114,6 @@ export default {
         name: [{ required: true, message: '请输入课程名', trigger: 'blur' }],
         code: [{ required: true, message: '请输入课程代码', trigger: 'blur' }],
         semesterId: [{ required: true, message: '请选择学期', trigger: 'change' }]
-      },
-      headerCellStyle: {
-        background: '#0f172a',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      },
-      cellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -239,121 +224,25 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 0;
 }
 
 .pagination-wrapper {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
-}
-
-.dark-table {
-  background: transparent !important;
-  color: #e2e8f0;
-}
-.dark-table::before {
-  display: none;
-}
->>> .dark-table .el-table__body tr:hover > td {
-  background: #334155 !important;
-}
->>> .dark-table .el-table__body tr.el-table__row--striped td {
-  background: #162032 !important;
-}
->>> .dark-table th.el-table__cell {
-  background: #0f172a !important;
-  color: #e2e8f0;
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table td.el-table__cell {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table .el-table__body-wrapper {
-  background: #1e293b;
-}
->>> .dark-table .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
->>> .dark-dialog {
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__body {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-}
-
->>> .dark-form .el-form-item__label {
-  color: #cbd5e1;
-}
->>> .dark-form .el-input__inner,
->>> .dark-form .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-form .el-input__inner:focus,
->>> .dark-form .el-textarea__inner:focus {
-  border-color: #10b981;
-}
->>> .dark-form .el-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
->>> .dark-input .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
->>> .el-pagination.is-background .el-pager li {
-  background: #0f172a;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-}
->>> .el-pagination.is-background .el-pager li:not(.disabled).active {
-  background: #10b981;
-  border-color: #10b981;
-}
->>> .el-pagination.is-background .btn-prev,
->>> .el-pagination.is-background .btn-next {
-  background: #0f172a;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-}
->>> .el-pagination__total {
-  color: #94a3b8;
-}
->>> .el-pagination__jump {
-  color: #94a3b8;
-}
->>> .el-pagination__editor .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
 }
 </style>

@@ -1,13 +1,12 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <!-- Search Bar -->
       <div class="search-bar">
         <el-input
           v-model="keyword"
           placeholder="搜索用户名/姓名"
           clearable
-          class="dark-input"
           style="width: 220px; margin-right: 12px;"
           @keyup.enter.native="handleSearch"
         >
@@ -17,7 +16,6 @@
           v-model="roleFilter"
           placeholder="角色筛选"
           clearable
-          class="dark-select"
           style="width: 150px; margin-right: 12px;"
           @change="handleSearch"
         >
@@ -34,35 +32,36 @@
       <el-table
         :data="tableData"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="headerCellStyle"
-        :cell-style="cellStyle"
         stripe
       >
         <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column label="头像" width="70" align="center">
+          <template slot-scope="scope">
+            <el-avatar :size="36" :src="scope.row.avatar" icon="el-icon-user-solid"></el-avatar>
+          </template>
+        </el-table-column>
+        <el-table-column prop="studentNo" label="学号" width="130"></el-table-column>
         <el-table-column prop="username" label="用户名" width="130"></el-table-column>
         <el-table-column prop="realName" label="姓名" width="120"></el-table-column>
         <el-table-column prop="role" label="角色" width="100">
           <template slot-scope="scope">
             <el-tag
               :type="roleTagType(scope.row.role)"
-              effect="dark"
               size="small"
             >{{ roleLabel(scope.row.role) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="college" label="学院" min-width="140"></el-table-column>
-        <el-table-column prop="studentNo" label="学号" width="130"></el-table-column>
         <el-table-column prop="status" label="状态" width="90">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'" effect="dark" size="small">
+            <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'" size="small">
               {{ scope.row.status === 1 ? '正常' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" style="color: #10b981;" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="text" style="color: #61BFAD;" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" style="color: #ef4444;" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -86,10 +85,9 @@
       :title="dialogType === 'add' ? '新增用户' : '编辑用户'"
       :visible.sync="dialogVisible"
       width="550px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
-      <el-form :model="form" :rules="rules" ref="userForm" label-width="80px" class="dark-form">
+      <el-form :model="form" :rules="rules" ref="userForm" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" :disabled="dialogType === 'edit'"></el-input>
         </el-form-item>
@@ -166,16 +164,6 @@ export default {
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         realName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         role: [{ required: true, message: '请选择角色', trigger: 'change' }]
-      },
-      headerCellStyle: {
-        background: '#0f172a',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      },
-      cellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -291,11 +279,12 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-bar {
@@ -310,112 +299,5 @@ export default {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
-}
-
-/* Dark Table */
-.dark-table {
-  background: transparent !important;
-  color: #e2e8f0;
-}
-.dark-table::before {
-  display: none;
-}
->>> .dark-table .el-table__body tr:hover > td {
-  background: #334155 !important;
-}
->>> .dark-table .el-table__body tr.el-table__row--striped td {
-  background: #162032 !important;
-}
->>> .dark-table th.el-table__cell {
-  background: #0f172a !important;
-  color: #e2e8f0;
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table td.el-table__cell {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table .el-table__body-wrapper {
-  background: #1e293b;
-}
->>> .dark-table .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-/* Dark Dialog */
->>> .dark-dialog {
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__body {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-}
-
-/* Dark Form */
->>> .dark-form .el-form-item__label {
-  color: #cbd5e1;
-}
->>> .dark-form .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-form .el-input__inner:focus {
-  border-color: #10b981;
-}
->>> .dark-form .el-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-/* Dark Input in search bar */
->>> .dark-input .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-/* Pagination */
->>> .el-pagination.is-background .el-pager li {
-  background: #0f172a;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-}
->>> .el-pagination.is-background .el-pager li:not(.disabled).active {
-  background: #10b981;
-  border-color: #10b981;
-}
->>> .el-pagination.is-background .btn-prev,
->>> .el-pagination.is-background .btn-next {
-  background: #0f172a;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-}
->>> .el-pagination__total {
-  color: #94a3b8;
-}
->>> .el-pagination__jump {
-  color: #94a3b8;
-}
->>> .el-pagination__editor .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
 }
 </style>

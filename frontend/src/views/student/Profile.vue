@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <!-- Left: Avatar Card -->
       <el-col :span="8">
-        <div class="dark-card avatar-card">
+        <div class="light-card avatar-card">
           <div class="avatar-section">
             <div class="avatar-wrapper">
               <el-avatar :size="100" :src="avatarUrl" class="user-avatar">
@@ -53,7 +53,7 @@
       <!-- Right: Profile Form & Password -->
       <el-col :span="16">
         <!-- Basic Info -->
-        <div class="dark-card">
+        <div class="light-card">
           <div class="card-header">
             <span>基本信息</span>
           </div>
@@ -69,7 +69,6 @@
                   <el-input
                     v-model="profileForm.username"
                     placeholder="请输入昵称"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -78,7 +77,6 @@
                   <el-input
                     v-model="profileForm.realName"
                     placeholder="请输入真实姓名"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -89,7 +87,6 @@
                   <el-input
                     v-model="profileForm.studentNo"
                     placeholder="请输入学号"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -98,7 +95,6 @@
                   <el-input
                     v-model="profileForm.className"
                     placeholder="请输入班级"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -109,7 +105,6 @@
                   <el-input
                     v-model="profileForm.major"
                     placeholder="请输入专业"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -118,7 +113,6 @@
                   <el-input
                     v-model="profileForm.college"
                     placeholder="请输入学院"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -129,7 +123,6 @@
                   <el-input
                     v-model="profileForm.phone"
                     placeholder="请输入手机号"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -138,7 +131,6 @@
                   <el-input
                     v-model="profileForm.email"
                     placeholder="请输入邮箱"
-                    class="dark-input"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -158,7 +150,7 @@
         </div>
 
         <!-- Change Password -->
-        <div class="dark-card">
+        <div class="light-card">
           <div class="card-header">
             <span>修改密码</span>
           </div>
@@ -175,7 +167,6 @@
                 type="password"
                 placeholder="请输入当前密码"
                 show-password
-                class="dark-input"
               ></el-input>
             </el-form-item>
             <el-form-item label="新密码" prop="newPassword">
@@ -184,7 +175,6 @@
                 type="password"
                 placeholder="请输入新密码 (至少6位)"
                 show-password
-                class="dark-input"
               ></el-input>
             </el-form-item>
             <el-form-item label="确认新密码" prop="confirmPassword">
@@ -193,7 +183,6 @@
                 type="password"
                 placeholder="请再次输入新密码"
                 show-password
-                class="dark-input"
               ></el-input>
             </el-form-item>
             <el-form-item>
@@ -387,21 +376,22 @@ export default {
   /* container */
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* Avatar Card */
@@ -421,7 +411,7 @@ export default {
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, #ec4899, #be185d) !important;
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e) !important;
   color: #fff !important;
   font-size: 36px !important;
   font-weight: 600;
@@ -461,19 +451,19 @@ export default {
 }
 
 .user-name {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 20px;
   font-weight: 600;
   margin: 0 0 4px 0;
 }
 
 .user-role {
-  color: #ec4899;
+  color: #61BFAD;
   font-size: 13px;
   margin: 0;
   padding: 2px 12px;
   display: inline-block;
-  background: rgba(236, 72, 153, 0.1);
+  background: rgba(97, 191, 173, 0.1);
   border-radius: 12px;
 }
 
@@ -481,14 +471,14 @@ export default {
 .info-list {
   text-align: left;
   padding-top: 16px;
-  border-top: 1px solid #334155;
+  border-top: 1px solid #e5e7eb;
 }
 
 .info-item {
   display: flex;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.4);
 }
 
 .info-item:last-child {
@@ -496,7 +486,7 @@ export default {
 }
 
 .info-item i {
-  color: #ec4899;
+  color: #61BFAD;
   font-size: 16px;
   margin-right: 10px;
   width: 20px;
@@ -510,7 +500,7 @@ export default {
 }
 
 .info-value {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 13px;
   flex: 1;
   text-align: right;
@@ -518,30 +508,11 @@ export default {
 
 /* Form */
 .profile-form >>> .el-form-item__label {
-  color: #94a3b8;
-}
-
-.dark-input >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.dark-input >>> .el-input__inner:focus {
-  border-color: #ec4899;
-}
-
-.dark-input >>> .el-input__inner::placeholder {
-  color: #475569;
-}
-
-/* Password show toggle */
-.dark-input >>> .el-input__suffix .el-input__icon {
   color: #64748b;
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #ec4899, #be185d) !important;
+  background: linear-gradient(135deg, #61BFAD, #4a9e8e) !important;
   border: none !important;
   padding: 10px 32px !important;
   border-radius: 8px !important;
@@ -550,6 +521,6 @@ export default {
 
 .save-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+  box-shadow: 0 4px 12px rgba(97, 191, 173, 0.3);
 }
 </style>

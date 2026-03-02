@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <!-- Header -->
       <div class="search-bar">
         <span class="page-title">轮播图管理</span>
@@ -11,9 +11,6 @@
       <el-table
         :data="tableData"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="headerCellStyle"
-        :cell-style="cellStyle"
         stripe
       >
         <el-table-column prop="id" label="ID" width="70"></el-table-column>
@@ -41,7 +38,7 @@
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" style="color: #10b981;" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="text" style="color: #61BFAD;" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" style="color: #ef4444;" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -53,10 +50,9 @@
       :title="dialogType === 'add' ? '新增轮播' : '编辑轮播'"
       :visible.sync="dialogVisible"
       width="550px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
-      <el-form :model="form" :rules="rules" ref="carouselForm" label-width="80px" class="dark-form">
+      <el-form :model="form" :rules="rules" ref="carouselForm" label-width="80px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题"></el-input>
         </el-form-item>
@@ -76,7 +72,7 @@
           <el-image
             v-if="form.imageUrl"
             :src="form.imageUrl"
-            style="width: 200px; height: 112px; margin-top: 8px; border-radius: 6px; border: 1px solid #334155;"
+            style="width: 200px; height: 112px; margin-top: 8px; border-radius: 6px; border: 1px solid #e5e7eb;"
             fit="cover"
           ></el-image>
         </el-form-item>
@@ -126,16 +122,6 @@ export default {
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         imageUrl: [{ required: true, message: '请输入图片地址', trigger: 'blur' }]
-      },
-      headerCellStyle: {
-        background: '#0f172a',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      },
-      cellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -248,11 +234,12 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-bar {
@@ -264,77 +251,6 @@ export default {
 .page-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
-}
-
-.dark-table {
-  background: transparent !important;
-  color: #e2e8f0;
-}
-.dark-table::before {
-  display: none;
-}
->>> .dark-table .el-table__body tr:hover > td {
-  background: #334155 !important;
-}
->>> .dark-table .el-table__body tr.el-table__row--striped td {
-  background: #162032 !important;
-}
->>> .dark-table th.el-table__cell {
-  background: #0f172a !important;
-  color: #e2e8f0;
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table td.el-table__cell {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table .el-table__body-wrapper {
-  background: #1e293b;
-}
->>> .dark-table .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
->>> .dark-dialog {
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__body {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-}
-
->>> .dark-form .el-form-item__label {
-  color: #cbd5e1;
-}
->>> .dark-form .el-input__inner,
->>> .dark-form .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-form .el-input__inner:focus,
->>> .dark-form .el-textarea__inner:focus {
-  border-color: #10b981;
-}
->>> .dark-form .el-input-group__append {
-  background: #334155;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-form .el-input-number .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 </style>

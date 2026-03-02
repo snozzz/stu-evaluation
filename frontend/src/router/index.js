@@ -134,6 +134,12 @@ const routes = [
         meta: { title: '\u6210\u7EE9\u7BA1\u7406', role: 'TEACHER' }
       },
       {
+        path: 'assignments',
+        name: 'TeacherAssignments',
+        component: () => import('../views/teacher/Assignments.vue'),
+        meta: { title: '作业与实验', role: 'TEACHER' }
+      },
+      {
         path: 'comments',
         name: 'CommentManage',
         component: () => import('../views/teacher/Comments.vue'),
@@ -177,6 +183,12 @@ const routes = [
         name: 'StudentScores',
         component: () => import('../views/student/Scores.vue'),
         meta: { title: '\u6211\u7684\u6210\u7EE9', role: 'STUDENT' }
+      },
+      {
+        path: 'assignments',
+        name: 'StudentAssignments',
+        component: () => import('../views/student/Assignments.vue'),
+        meta: { title: '作业与实验', role: 'STUDENT' }
       },
       {
         path: 'selfEval',

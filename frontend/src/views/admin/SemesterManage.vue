@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <!-- Header -->
       <div class="search-bar">
         <span class="page-title">学期管理</span>
@@ -11,9 +11,6 @@
       <el-table
         :data="tableData"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="headerCellStyle"
-        :cell-style="cellStyle"
         stripe
       >
         <el-table-column prop="id" label="ID" width="70"></el-table-column>
@@ -37,7 +34,7 @@
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" style="color: #10b981;" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="text" style="color: #61BFAD;" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button
               type="text"
               style="color: #f59e0b;"
@@ -54,10 +51,9 @@
       :title="dialogType === 'add' ? '新增学期' : '编辑学期'"
       :visible.sync="dialogVisible"
       width="500px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
-      <el-form :model="form" :rules="rules" ref="semesterForm" label-width="80px" class="dark-form">
+      <el-form :model="form" :rules="rules" ref="semesterForm" label-width="80px">
         <el-form-item label="学期名" prop="name">
           <el-input v-model="form.name" placeholder="例如：2025-2026学年第一学期"></el-input>
         </el-form-item>
@@ -108,16 +104,6 @@ export default {
         name: [{ required: true, message: '请输入学期名', trigger: 'blur' }],
         startDate: [{ required: true, message: '请选择开始日期', trigger: 'change' }],
         endDate: [{ required: true, message: '请选择结束日期', trigger: 'change' }]
-      },
-      headerCellStyle: {
-        background: '#0f172a',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      },
-      cellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -216,86 +202,25 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 0;
 }
 
 .page-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
-}
-
-.dark-table {
-  background: transparent !important;
-  color: #e2e8f0;
-}
-.dark-table::before {
-  display: none;
-}
->>> .dark-table .el-table__body tr:hover > td {
-  background: #334155 !important;
-}
->>> .dark-table .el-table__body tr.el-table__row--striped td {
-  background: #162032 !important;
-}
->>> .dark-table th.el-table__cell {
-  background: #0f172a !important;
-  color: #e2e8f0;
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table td.el-table__cell {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-table .el-table__body-wrapper {
-  background: #1e293b;
-}
->>> .dark-table .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
->>> .dark-dialog {
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-}
->>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__body {
-  color: #e2e8f0;
-}
->>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-}
-
->>> .dark-form .el-form-item__label {
-  color: #cbd5e1;
-}
->>> .dark-form .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .dark-form .el-input__inner:focus {
-  border-color: #10b981;
-}
->>> .dark-form .el-date-editor .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 </style>

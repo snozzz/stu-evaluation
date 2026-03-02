@@ -90,7 +90,6 @@ export const getWeightedScore = (studentId, courseId) => request.get(`/api/score
 // Comments
 export const getComments = params => request.get('/api/comment/list', { params })
 export const saveComment = data => request.post('/api/comment/save', data)
-export const generateAIComment = params => request.post('/api/comment/ai-generate', null, { params })
 export const publishComment = id => request.put(`/api/comment/publish/${id}`)
 
 // Self Evaluation
@@ -123,6 +122,7 @@ export const updateAlertRule = (id, data) => request.put(`/api/alert/rule/${id}`
 export const deleteAlertRule = id => request.delete(`/api/alert/rule/${id}`)
 export const getAlertRecords = () => request.get('/api/alert/records')
 export const markAlertRead = id => request.put(`/api/alert/record/read/${id}`)
+export const getStudentAlerts = id => request.get(`/api/alert/student/${id}`)
 
 // Config
 export const getConfigs = () => request.get('/api/config/list')
@@ -141,6 +141,15 @@ export const getDashboardStats = () => request.get('/api/dashboard/stats')
 
 // File upload
 export const uploadFile = formData => request.post('/api/file/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+
+// Assignment
+export const createAssignment = data => request.post('/api/assignment/create', data)
+export const getAssignmentList = params => request.get('/api/assignment/list', { params })
+export const deleteAssignment = id => request.delete(`/api/assignment/${id}`)
+export const submitAssignment = data => request.post('/api/assignment/submit', data)
+export const getAssignmentSubmissions = params => request.get('/api/assignment/submissions', { params })
+export const getStudentAssignments = params => request.get('/api/assignment/student', { params })
+export const gradeAssignment = data => request.post('/api/assignment/grade', data)
 
 // Aliases for admin views compatibility
 export const getDimensionList = getDimensions

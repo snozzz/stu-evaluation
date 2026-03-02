@@ -12,9 +12,9 @@
       <el-menu
         :default-active="activeMenu"
         class="sidebar-menu"
-        background-color="#1a1a2e"
-        text-color="#94a3b8"
-        active-text-color="#10b981"
+        background-color="#ffffff"
+        text-color="#64748b"
+        active-text-color="#61BFAD"
         router
         :collapse="isCollapse"
       >
@@ -98,7 +98,7 @@
               <span class="user-name">{{ userName }}</span>
               <i class="el-icon-arrow-down"></i>
             </div>
-            <el-dropdown-menu slot="dropdown" class="dark-dropdown">
+            <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="profile">
                 <i class="el-icon-user"></i> 个人中心
               </el-dropdown-item>
@@ -192,7 +192,7 @@ export default {
 .admin-layout {
   display: flex;
   height: 100vh;
-  background: #0f0f1a;
+  background: #f5f5f5;
   overflow: hidden;
 }
 
@@ -200,10 +200,10 @@ export default {
 .sidebar {
   width: 220px;
   min-width: 220px;
-  background: #1a1a2e;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #334155;
+  border-right: 1px solid #e5e7eb;
   transition: width 0.3s ease;
   overflow: hidden;
 }
@@ -220,7 +220,7 @@ export default {
   justify-content: center;
   gap: 10px;
   padding: 0 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   flex-shrink: 0;
 }
 
@@ -228,7 +228,7 @@ export default {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #61BFAD, #4da89a);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -247,10 +247,7 @@ export default {
 .logo-text {
   font-size: 18px;
   font-weight: 700;
-  background: linear-gradient(135deg, #10b981, #34d399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #61BFAD;
   white-space: nowrap;
 }
 
@@ -267,7 +264,7 @@ export default {
 }
 
 .sidebar-menu::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #d1d5db;
   border-radius: 4px;
 }
 
@@ -293,13 +290,13 @@ export default {
 }
 
 .sidebar-menu .el-menu-item:hover {
-  background: rgba(16, 185, 129, 0.08) !important;
-  color: #e2e8f0 !important;
+  background: #f0fdfa !important;
+  color: #2c3e50 !important;
 }
 
 .sidebar-menu .el-menu-item.is-active {
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: #10b981 !important;
+  background: rgba(97, 191, 173, 0.12) !important;
+  color: #61BFAD !important;
   font-weight: 600;
   position: relative;
 }
@@ -312,7 +309,7 @@ export default {
   transform: translateY(-50%);
   width: 3px;
   height: 20px;
-  background: #10b981;
+  background: #61BFAD;
   border-radius: 0 3px 3px 0;
 }
 
@@ -328,8 +325,8 @@ export default {
 /* Header */
 .header-bar {
   height: 64px;
-  background: #16213e;
-  border-bottom: 1px solid #334155;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -345,13 +342,13 @@ export default {
 
 .collapse-btn {
   font-size: 20px;
-  color: #94a3b8;
+  color: #64748b;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .collapse-btn:hover {
-  color: #10b981;
+  color: #61BFAD;
 }
 
 /* Breadcrumb overrides */
@@ -360,25 +357,25 @@ export default {
 }
 
 .breadcrumb >>> .el-breadcrumb__inner {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   font-size: 13px;
 }
 
 .breadcrumb >>> .el-breadcrumb__inner a {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   font-weight: 400;
 }
 
 .breadcrumb >>> .el-breadcrumb__inner a:hover {
-  color: #10b981 !important;
+  color: #61BFAD !important;
 }
 
 .breadcrumb >>> .el-breadcrumb__separator {
-  color: #475569 !important;
+  color: #9ca3af !important;
 }
 
 .breadcrumb >>> .el-breadcrumb__item:last-child .el-breadcrumb__inner {
-  color: #e2e8f0 !important;
+  color: #2c3e50 !important;
 }
 
 .header-right {
@@ -397,23 +394,23 @@ export default {
 }
 
 .user-info:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f5f5f5;
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, #10b981, #059669) !important;
+  background: linear-gradient(135deg, #61BFAD, #4da89a) !important;
   color: #fff !important;
   font-size: 14px !important;
   font-weight: 600;
 }
 
 .user-name {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 14px;
 }
 
 .user-info .el-icon-arrow-down {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 12px;
   transition: transform 0.2s;
 }
@@ -423,7 +420,7 @@ export default {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background: #0f0f1a;
+  background: #f5f5f5;
 }
 
 .content-area::-webkit-scrollbar {
@@ -431,7 +428,7 @@ export default {
 }
 
 .content-area::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #d1d5db;
   border-radius: 6px;
 }
 

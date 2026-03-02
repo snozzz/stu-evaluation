@@ -1,6 +1,6 @@
 <template>
   <div class="teacher-binding-page">
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span class="card-title">教师权限分配</span>
       </div>
@@ -13,7 +13,7 @@
           placeholder="请选择教师"
           filterable
           clearable
-          class="dark-select teacher-select"
+          class="teacher-select"
           @change="handleTeacherChange"
         >
           <el-option
@@ -39,9 +39,6 @@
         <el-table
           :data="bindings"
           style="width: 100%"
-          class="dark-table"
-          :header-cell-style="tableHeaderStyle"
-          :cell-style="tableCellStyle"
           v-loading="loadingBindings"
           element-loading-background="rgba(30, 41, 59, 0.8)"
           empty-text="该教师暂无绑定记录"
@@ -95,17 +92,15 @@
       title="新增课程班级绑定"
       :visible.sync="addDialogVisible"
       width="480px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
-      <el-form :model="addForm" label-width="80px" class="dark-form">
+      <el-form :model="addForm" label-width="80px">
         <el-form-item label="选择课程">
           <el-select
             v-model="addForm.courseId"
             placeholder="请选择课程"
             filterable
             style="width: 100%"
-            class="dark-select"
           >
             <el-option
               v-for="course in courseList"
@@ -121,7 +116,6 @@
             placeholder="请选择班级"
             filterable
             style="width: 100%"
-            class="dark-select"
           >
             <el-option
               v-for="cls in classList"
@@ -133,7 +127,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false" class="cancel-btn">取 消</el-button>
+        <el-button @click="addDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleAddBinding" :loading="addLoading">确 定</el-button>
       </div>
     </el-dialog>
@@ -158,17 +152,6 @@ export default {
       addForm: {
         courseId: null,
         classId: null
-      },
-      tableHeaderStyle: {
-        background: '#162032',
-        color: '#94a3b8',
-        borderBottom: '1px solid #334155',
-        fontWeight: '600'
-      },
-      tableCellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -280,11 +263,12 @@ export default {
   padding: 0;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -297,7 +281,7 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .filter-bar {
@@ -306,11 +290,11 @@ export default {
   gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .filter-label {
-  color: #94a3b8;
+  color: #606266;
   font-size: 14px;
   white-space: nowrap;
 }
@@ -320,148 +304,19 @@ export default {
 }
 
 .course-name {
-  color: #10b981;
+  color: #61BFAD;
   font-weight: 500;
 }
 
 .empty-tip {
   text-align: center;
-  color: #64748b;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }
 
 .empty-tip i {
   margin-right: 6px;
-}
-
-/* Table Styles */
-.dark-table {
-  background: transparent !important;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__row:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #263348 !important;
-}
-
-.dark-table >>> th.el-table__cell {
-  background: #162032 !important;
-}
-
-.dark-table::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed-right::before,
-.dark-table >>> .el-table__fixed::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed,
-.dark-table >>> .el-table__fixed-right {
-  background: #1e293b;
-}
-
-/* Select Styles */
->>> .dark-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
->>> .dark-select .el-input__inner:focus {
-  border-color: #10b981;
-}
-
-/* Dialog Styles */
-.teacher-binding-page >>> .dark-dialog {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-}
-
-.teacher-binding-page >>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-  padding: 16px 20px;
-}
-
-.teacher-binding-page >>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.teacher-binding-page >>> .dark-dialog .el-dialog__headerbtn .el-dialog__close {
-  color: #94a3b8;
-}
-
-.teacher-binding-page >>> .dark-dialog .el-dialog__body {
-  padding: 20px;
-}
-
-.teacher-binding-page >>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-  padding: 12px 20px;
-}
-
-/* Form Styles */
-.dark-form >>> .el-form-item__label {
-  color: #94a3b8;
-}
-
-.dark-form >>> .el-input__inner,
-.dark-form >>> .el-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.dark-form >>> .el-input__inner:focus,
-.dark-form >>> .el-select .el-input__inner:focus {
-  border-color: #10b981;
-}
-
-.dark-form >>> .el-select-dropdown {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-.dark-form >>> .el-select-dropdown__item {
-  color: #e2e8f0;
-}
-
-.dark-form >>> .el-select-dropdown__item.hover,
-.dark-form >>> .el-select-dropdown__item:hover {
-  background: #263348;
-}
-
-.dark-form >>> .el-select-dropdown__item.selected {
-  color: #10b981;
-}
-
-.cancel-btn {
-  background: transparent;
-  border-color: #475569;
-  color: #94a3b8;
-}
-
-.cancel-btn:hover {
-  background: #334155;
-  border-color: #475569;
-  color: #e2e8f0;
 }
 
 .dialog-footer {

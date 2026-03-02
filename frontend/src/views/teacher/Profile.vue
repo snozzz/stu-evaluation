@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <!-- Left: Avatar -->
       <el-col :span="8">
-        <div class="dark-card avatar-card">
+        <div class="light-card avatar-card">
           <div class="card-header">
             <span class="card-title">头像设置</span>
           </div>
@@ -45,7 +45,7 @@
       <!-- Right: Profile Form & Password -->
       <el-col :span="16">
         <!-- Profile Form -->
-        <div class="dark-card profile-form-card">
+        <div class="light-card profile-form-card">
           <div class="card-header">
             <span class="card-title">基本信息</span>
           </div>
@@ -53,7 +53,6 @@
             ref="profileForm"
             :model="userForm"
             label-width="80px"
-            class="dark-form"
           >
             <el-row :gutter="20">
               <el-col :span="12">
@@ -100,7 +99,7 @@
         </div>
 
         <!-- Password Change -->
-        <div class="dark-card password-card">
+        <div class="light-card password-card">
           <div class="card-header">
             <span class="card-title">修改密码</span>
           </div>
@@ -109,7 +108,6 @@
             :model="passwordForm"
             :rules="passwordRules"
             label-width="100px"
-            class="dark-form"
           >
             <el-row :gutter="20">
               <el-col :span="12">
@@ -322,12 +320,13 @@ export default {
   padding: 0;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -340,7 +339,7 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 /* Avatar Card */
@@ -357,8 +356,8 @@ export default {
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #f59e0b;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  border: 3px solid #61BFAD;
+  box-shadow: 0 0 20px rgba(97, 191, 173, 0.2);
 }
 
 .avatar-img {
@@ -373,7 +372,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #61BFAD, #4ea899);
   color: #fff;
   font-size: 40px;
   font-weight: 700;
@@ -385,7 +384,7 @@ export default {
 
 .avatar-tip {
   font-size: 12px;
-  color: #475569;
+  color: #d1d5db;
   text-align: center;
 }
 
@@ -396,69 +395,31 @@ export default {
   align-items: center;
   gap: 8px;
   padding-top: 16px;
-  border-top: 1px solid #334155;
+  border-top: 1px solid #e5e7eb;
 }
 
 .summary-name {
   font-size: 18px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .summary-info {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .summary-info i {
   margin-right: 4px;
-  color: #475569;
-}
-
-/* Form Styles */
-.dark-form >>> .el-form-item__label {
-  color: #94a3b8;
-}
-
-.dark-form >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.dark-form >>> .el-input__inner:focus {
-  border-color: #f59e0b;
-}
-
-.dark-form >>> .el-input__inner::placeholder {
-  color: #475569;
-}
-
-.dark-form >>> .el-input__inner[disabled] {
-  background: #162032;
-  color: #64748b;
-  cursor: not-allowed;
-}
-
-/* Password Visibility Toggle */
-.dark-form >>> .el-input__suffix {
-  color: #64748b;
-}
-
-.dark-form >>> .el-input__suffix .el-input__icon {
-  color: #64748b;
-}
-
-.dark-form >>> .el-input__suffix .el-input__icon:hover {
-  color: #94a3b8;
+  color: #d1d5db;
 }
 
 /* Validation Error */
-.dark-form >>> .el-form-item__error {
+.profile-page >>> .el-form-item__error {
   color: #ef4444;
 }
 
-.dark-form >>> .el-form-item.is-error .el-input__inner {
+.profile-page >>> .el-form-item.is-error .el-input__inner {
   border-color: #ef4444;
 }
 </style>

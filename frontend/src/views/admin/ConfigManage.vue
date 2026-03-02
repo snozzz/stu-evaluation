@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span class="page-title">系统配置</span>
       </div>
@@ -156,23 +156,24 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .page-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .config-list {
@@ -185,7 +186,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 18px 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   gap: 20px;
   transition: background 0.2s;
 }
@@ -195,7 +196,7 @@ export default {
 }
 
 .config-item:hover {
-  background: rgba(16, 185, 129, 0.03);
+  background: rgba(97, 191, 173, 0.03);
 }
 
 .config-info {
@@ -205,14 +206,14 @@ export default {
 
 .config-label {
   font-size: 14px;
-  color: #e2e8f0;
+  color: #2c3e50;
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .config-key {
   font-size: 12px;
-  color: #64748b;
+  color: #909399;
   font-family: monospace;
 }
 
@@ -230,13 +231,13 @@ export default {
   width: 64px;
   height: 64px;
   border-radius: 10px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f172a;
+  background: #f9fafb;
 }
 
 .logo-preview-img {
@@ -248,7 +249,7 @@ export default {
 .logo-placeholder {
   flex-direction: column;
   gap: 4px;
-  color: #64748b;
+  color: #909399;
   font-size: 12px;
 }
 
@@ -262,24 +263,15 @@ export default {
 
 .loading-text {
   text-align: center;
-  color: #64748b;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }
 
 .empty-text {
   text-align: center;
-  color: #64748b;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
-}
-
->>> .config-input .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .config-input .el-input__inner:focus {
-  border-color: #10b981;
 }
 </style>

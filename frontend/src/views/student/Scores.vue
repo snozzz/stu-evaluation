@@ -1,7 +1,7 @@
 <template>
   <div class="scores-container">
     <!-- Course Select -->
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span>我的成绩</span>
         <el-select
@@ -23,7 +23,7 @@
 
     <div v-if="selectedCourseId">
       <!-- Score Overview Table -->
-      <div class="dark-card">
+      <div class="light-card">
         <div class="card-header">
           <span>成绩总览</span>
           <div class="weighted-total" v-if="weightedTotal !== null">
@@ -33,9 +33,6 @@
         <el-table
           :data="scoreTableData"
           style="width: 100%"
-          class="dark-table"
-          :header-cell-style="{ background: '#0f172a', color: '#94a3b8', borderColor: '#334155' }"
-          :cell-style="{ background: '#1e293b', color: '#e2e8f0', borderColor: '#334155' }"
           empty-text="暂无成绩数据"
         >
           <el-table-column prop="dimensionName" label="维度" min-width="120"></el-table-column>
@@ -69,7 +66,7 @@
       </div>
 
       <!-- Teacher Comment Section -->
-      <div class="dark-card" v-if="teacherComment">
+      <div class="light-card" v-if="teacherComment">
         <div class="card-header">
           <span>教师评语</span>
         </div>
@@ -85,18 +82,8 @@
         </div>
       </div>
 
-      <!-- AI Summary Section -->
-      <div class="dark-card" v-if="aiSummary">
-        <div class="card-header">
-          <span><i class="el-icon-cpu" style="margin-right: 6px;"></i>AI 综合评价</span>
-        </div>
-        <div class="ai-summary-box">
-          <div class="ai-summary-content">{{ aiSummary }}</div>
-        </div>
-      </div>
-
       <!-- Bar Chart -->
-      <div class="dark-card">
+      <div class="light-card">
         <div class="card-header">
           <span>教师评分 vs 自评分数对比</span>
         </div>
@@ -104,8 +91,8 @@
       </div>
     </div>
 
-    <div v-else class="dark-card empty-state">
-      <i class="el-icon-document-checked" style="font-size: 48px; color: #334155;"></i>
+    <div v-else class="light-card empty-state">
+      <i class="el-icon-document-checked" style="font-size: 48px; color: #e5e7eb;"></i>
       <p>请选择课程查看成绩详情</p>
     </div>
   </div>
@@ -126,7 +113,6 @@ export default {
       selfEvals: [],
       weights: [],
       teacherComment: null,
-      aiSummary: '',
       weightedTotal: null,
       barChart: null
     }
@@ -239,13 +225,10 @@ export default {
           const cd = commentRes.data.data
           if (Array.isArray(cd) && cd.length > 0) {
             this.teacherComment = cd[0]
-            this.aiSummary = cd[0].aiSummary || ''
           } else if (cd && !Array.isArray(cd)) {
             this.teacherComment = cd
-            this.aiSummary = cd.aiSummary || ''
           } else {
             this.teacherComment = null
-            this.aiSummary = ''
           }
         }
         if (weightRes.data.code === 200) {
@@ -307,13 +290,13 @@ export default {
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'shadow' },
-          backgroundColor: '#1e293b',
-          borderColor: '#334155',
-          textStyle: { color: '#e2e8f0' }
+          backgroundColor: '#ffffff',
+          borderColor: '#e5e7eb',
+          textStyle: { color: '#2c3e50' }
         },
         legend: {
           data: ['教师评分', '自评分数'],
-          textStyle: { color: '#94a3b8' },
+          textStyle: { color: '#64748b' },
           top: 10
         },
         grid: {
@@ -326,9 +309,9 @@ export default {
         xAxis: {
           type: 'category',
           data: dimNames,
-          axisLine: { lineStyle: { color: '#334155' } },
+          axisLine: { lineStyle: { color: '#e5e7eb' } },
           axisLabel: {
-            color: '#94a3b8',
+            color: '#64748b',
             rotate: dimNames.length > 5 ? 30 : 0,
             fontSize: 12
           }
@@ -336,9 +319,9 @@ export default {
         yAxis: {
           type: 'value',
           max: 100,
-          axisLine: { lineStyle: { color: '#334155' } },
-          axisLabel: { color: '#94a3b8' },
-          splitLine: { lineStyle: { color: '#334155' } }
+          axisLine: { lineStyle: { color: '#e5e7eb' } },
+          axisLabel: { color: '#64748b' },
+          splitLine: { lineStyle: { color: '#e5e7eb' } }
         },
         series: [
           {
@@ -348,8 +331,8 @@ export default {
             data: teacherValues,
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#ec4899' },
-                { offset: 1, color: '#be185d' }
+                { offset: 0, color: '#61BFAD' },
+                { offset: 1, color: '#4a9e8e' }
               ]),
               borderRadius: [4, 4, 0, 0]
             }
@@ -382,21 +365,22 @@ export default {
   /* container */
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -406,47 +390,20 @@ export default {
   width: 220px;
 }
 
-.course-select >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.course-select >>> .el-input__inner:focus {
-  border-color: #ec4899;
-}
-
 .weighted-total {
   font-size: 14px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .total-score {
   font-size: 20px;
   font-weight: 700;
-  color: #ec4899;
+  color: #61BFAD;
   margin-left: 4px;
 }
 
-/* Dark Table */
-.dark-table >>> .el-table__empty-text {
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table::before {
-  background-color: #334155;
-}
-
 .score-excellent {
-  color: #10b981;
+  color: #61BFAD;
   font-weight: 600;
 }
 
@@ -466,14 +423,14 @@ export default {
 }
 
 .weighted-score {
-  color: #ec4899;
+  color: #61BFAD;
   font-weight: 600;
 }
 
 /* Comment Quote */
 .comment-quote {
   display: flex;
-  background: rgba(236, 72, 153, 0.05);
+  background: rgba(97, 191, 173, 0.05);
   border-radius: 8px;
   padding: 16px 20px;
   margin-top: 4px;
@@ -481,7 +438,7 @@ export default {
 
 .quote-bar {
   width: 4px;
-  background: linear-gradient(180deg, #ec4899, #be185d);
+  background: linear-gradient(180deg, #61BFAD, #4a9e8e);
   border-radius: 4px;
   margin-right: 16px;
   flex-shrink: 0;
@@ -492,7 +449,7 @@ export default {
 }
 
 .comment-text {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 14px;
   line-height: 1.7;
   margin: 0 0 10px 0;
@@ -508,20 +465,6 @@ export default {
 
 .comment-time {
   color: #475569;
-}
-
-/* AI Summary */
-.ai-summary-box {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.06), rgba(139, 92, 246, 0.06));
-  border: 1px solid rgba(236, 72, 153, 0.15);
-  border-radius: 8px;
-  padding: 16px 20px;
-}
-
-.ai-summary-content {
-  color: #cbd5e1;
-  font-size: 14px;
-  line-height: 1.8;
 }
 
 /* Chart */

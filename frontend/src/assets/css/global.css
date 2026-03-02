@@ -1,39 +1,43 @@
 /* ============================================================
-   Student Learning Evaluation System - Dark Theme Global Styles
+   Student Learning Evaluation System - Light Theme Global Styles
    ============================================================ */
 
 /* ---------- CSS Variables ---------- */
 :root {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
-  --bg-card: #1e293b;
-  --bg-input: #0f172a;
-  --bg-hover: #253347;
-  --bg-body: #0f0f1a;
-  --accent: #10b981;
-  --accent-hover: #059669;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-card: #ffffff;
+  --bg-input: #f9fafb;
+  --bg-hover: #f0fdfa;
+  --bg-body: #f5f5f5;
+  --accent: #61BFAD;
+  --accent-hover: #4da89a;
   --accent-secondary: #f59e0b;
   --accent-danger: #ef4444;
   --accent-info: #3b82f6;
   --accent-purple: #8b5cf6;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: #334155;
-  --border-light: #475569;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+  --text-primary: #2c3e50;
+  --text-secondary: #64748b;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --border-light: #d1d5db;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --gradient-green: linear-gradient(135deg, #10b981, #059669);
+  --gradient-green: linear-gradient(135deg, #61BFAD, #4da89a);
   --gradient-amber: linear-gradient(135deg, #f59e0b, #d97706);
   --gradient-red: linear-gradient(135deg, #ef4444, #dc2626);
   --gradient-blue: linear-gradient(135deg, #3b82f6, #2563eb);
   --gradient-purple: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  --gradient-card: linear-gradient(145deg, #1e293b, #1a1a2e);
+  --gradient-card: linear-gradient(145deg, #ffffff, #f8fafc);
+
+  /* status */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
 }
 
 /* ---------- Base Reset ---------- */
@@ -269,10 +273,10 @@ a:hover {
 
 .el-button--primary:hover,
 .el-button--primary:focus {
-  background: linear-gradient(135deg, #059669, #047857) !important;
+  background: linear-gradient(135deg, #4da89a, #3d9a8c) !important;
   border-color: var(--accent-hover) !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 16px rgba(97, 191, 173, 0.3);
 }
 
 .el-button--success {
@@ -283,7 +287,7 @@ a:hover {
 
 .el-button--success:hover,
 .el-button--success:focus {
-  background: linear-gradient(135deg, #059669, #047857) !important;
+  background: linear-gradient(135deg, #4da89a, #3d9a8c) !important;
   border-color: var(--accent-hover) !important;
   color: #fff !important;
 }
@@ -390,7 +394,7 @@ a:hover {
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
-  background-color: rgba(22, 33, 62, 0.5) !important;
+  background-color: #f9fafb !important;
 }
 
 .el-table__empty-block {
@@ -450,7 +454,7 @@ a:hover {
 
 .el-input__inner:focus {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(97, 191, 173, 0.15) !important;
 }
 
 .el-input__prefix,
@@ -490,7 +494,7 @@ a:hover {
 
 .el-textarea__inner:focus {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(97, 191, 173, 0.15) !important;
 }
 
 /* ---------- el-select ---------- */
@@ -601,7 +605,7 @@ a:hover {
 
 .el-menu-item.is-active {
   color: var(--accent) !important;
-  background: rgba(16, 185, 129, 0.1) !important;
+  background: rgba(97, 191, 173, 0.1) !important;
   font-weight: 600;
 }
 
@@ -618,7 +622,7 @@ a:hover {
 }
 
 .el-submenu .el-menu {
-  background-color: rgba(15, 23, 42, 0.5) !important;
+  background-color: #f5f5f5 !important;
 }
 
 .el-submenu .el-menu-item {
@@ -753,7 +757,7 @@ a:hover {
 }
 
 .el-tag--success {
-  background-color: rgba(16, 185, 129, 0.15) !important;
+  background-color: rgba(97, 191, 173, 0.15) !important;
   color: var(--accent) !important;
 }
 
@@ -768,7 +772,7 @@ a:hover {
 }
 
 .el-tag--primary {
-  background-color: rgba(16, 185, 129, 0.15) !important;
+  background-color: rgba(97, 191, 173, 0.15) !important;
   color: var(--accent) !important;
 }
 
@@ -1108,7 +1112,7 @@ a:hover {
 
 /* ---------- el-loading ---------- */
 .el-loading-mask {
-  background-color: rgba(15, 15, 26, 0.8) !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(4px);
 }
 
@@ -1133,7 +1137,7 @@ a:hover {
 }
 
 .el-alert--success {
-  background-color: rgba(16, 185, 129, 0.1) !important;
+  background-color: rgba(97, 191, 173, 0.1) !important;
   color: var(--accent) !important;
 }
 
@@ -1274,7 +1278,7 @@ a:hover {
 }
 
 .el-tree-node.is-current > .el-tree-node__content {
-  background-color: rgba(16, 185, 129, 0.1) !important;
+  background-color: rgba(97, 191, 173, 0.1) !important;
   color: var(--accent) !important;
 }
 
@@ -1492,7 +1496,7 @@ a:hover {
 
 /* Selection color */
 ::selection {
-  background-color: rgba(16, 185, 129, 0.3);
+  background-color: rgba(97, 191, 173, 0.3);
   color: #fff;
 }
 

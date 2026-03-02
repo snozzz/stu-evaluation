@@ -1,7 +1,7 @@
 <template>
   <div class="teacher-dashboard">
     <!-- Carousel -->
-    <div class="dark-card carousel-card" v-if="carousels.length > 0">
+    <div class="light-card carousel-card" v-if="carousels.length > 0">
       <el-carousel height="280px" :interval="4000" arrow="hover" indicator-position="outside">
         <el-carousel-item v-for="item in carousels" :key="item.id">
           <a :href="item.linkUrl || 'javascript:;'" class="carousel-link">
@@ -61,7 +61,7 @@
     </el-row>
 
     <!-- Middle: ECharts Pie Chart -->
-    <div class="dark-card chart-section">
+    <div class="light-card chart-section">
       <div class="card-header">
         <span class="card-title">评价维度分布</span>
       </div>
@@ -69,7 +69,7 @@
     </div>
 
     <!-- Bottom: Recent Appeals/Feedback List -->
-    <div class="dark-card feedback-section">
+    <div class="light-card feedback-section">
       <div class="card-header">
         <span class="card-title">最近反馈 / 申诉</span>
         <el-button type="text" class="view-all-btn" @click="$router.push('/teacher/appeals')">
@@ -79,9 +79,6 @@
       <el-table
         :data="recentAppeals"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="tableHeaderStyle"
-        :cell-style="tableCellStyle"
         empty-text="暂无反馈记录"
       >
         <el-table-column prop="studentName" label="学生姓名" width="120"></el-table-column>
@@ -124,18 +121,7 @@ export default {
       },
       recentAppeals: [],
       carousels: [],
-      chartInstance: null,
-      tableHeaderStyle: {
-        background: '#162032',
-        color: '#94a3b8',
-        borderBottom: '1px solid #334155',
-        fontWeight: '600'
-      },
-      tableCellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      }
+      chartInstance: null
     }
   },
   mounted() {
@@ -194,15 +180,15 @@ export default {
             backgroundColor: 'transparent',
             tooltip: {
               trigger: 'item',
-              backgroundColor: '#1e293b',
-              borderColor: '#334155',
-              textStyle: { color: '#e2e8f0' }
+              backgroundColor: '#ffffff',
+              borderColor: '#e5e7eb',
+              textStyle: { color: '#2c3e50' }
             },
             legend: {
               orient: 'vertical',
               right: '5%',
               top: 'center',
-              textStyle: { color: '#94a3b8', fontSize: 13 },
+              textStyle: { color: '#64748b', fontSize: 13 },
               itemWidth: 12,
               itemHeight: 12,
               itemGap: 16
@@ -216,17 +202,17 @@ export default {
                 avoidLabelOverlap: true,
                 itemStyle: {
                   borderRadius: 8,
-                  borderColor: '#1e293b',
+                  borderColor: '#ffffff',
                   borderWidth: 3
                 },
                 label: {
                   show: true,
-                  color: '#e2e8f0',
+                  color: '#2c3e50',
                   fontSize: 12,
                   formatter: '{b}: {d}%'
                 },
                 labelLine: {
-                  lineStyle: { color: '#475569' }
+                  lineStyle: { color: '#d1d5db' }
                 },
                 emphasis: {
                   label: { show: true, fontSize: 14, fontWeight: 'bold' },
@@ -237,8 +223,8 @@ export default {
                   }
                 },
                 data: [
-                  { value: 25, name: '考勤', itemStyle: { color: '#f59e0b' } },
-                  { value: 25, name: '作业', itemStyle: { color: '#10b981' } },
+                  { value: 25, name: '考勤', itemStyle: { color: '#61BFAD' } },
+                  { value: 25, name: '作业', itemStyle: { color: '#61BFAD' } },
                   { value: 20, name: '实验', itemStyle: { color: '#8b5cf6' } },
                   { value: 15, name: '测验', itemStyle: { color: '#ef4444' } },
                   { value: 15, name: '课堂参与', itemStyle: { color: '#3b82f6' } }
@@ -309,15 +295,15 @@ export default {
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .amber-gradient {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #61BFAD, #4ea899);
 }
 
 .green-gradient {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #61BFAD, #4ea899);
 }
 
 .purple-gradient {
@@ -358,13 +344,14 @@ export default {
   margin-top: 4px;
 }
 
-/* Dark Card */
-.dark-card {
-  background: #1e293b;
+/* Light Card */
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -377,16 +364,16 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .view-all-btn {
-  color: #f59e0b !important;
+  color: #61BFAD !important;
   font-size: 13px;
 }
 
 .view-all-btn:hover {
-  color: #fbbf24 !important;
+  color: #4ea899 !important;
 }
 
 /* Chart */
@@ -399,50 +386,6 @@ export default {
   height: 360px;
 }
 
-/* Table Styles */
-.dark-table {
-  background: transparent !important;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__row:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #263348 !important;
-}
-
-.dark-table >>> th.el-table__cell {
-  background: #162032 !important;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.dark-table::before {
-  display: none;
-}
-
 .carousel-card {
   padding: 0;
   overflow: hidden;
@@ -452,10 +395,10 @@ export default {
   margin-top: -10px;
 }
 .carousel-card >>> .el-carousel__indicator .el-carousel__button {
-  background: #475569;
+  background: #d1d5db;
 }
 .carousel-card >>> .el-carousel__indicator.is-active .el-carousel__button {
-  background: #f59e0b;
+  background: #61BFAD;
 }
 .carousel-link {
   display: block;

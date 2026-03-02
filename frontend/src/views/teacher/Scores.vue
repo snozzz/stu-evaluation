@@ -1,7 +1,7 @@
 <template>
   <div class="scores-page">
     <!-- Top Filters -->
-    <div class="dark-card filter-section">
+    <div class="light-card filter-section">
       <el-row :gutter="16" type="flex" align="middle">
         <el-col :span="6">
           <div class="filter-label">选择课程</div>
@@ -11,7 +11,6 @@
             filterable
             clearable
             style="width: 100%"
-            class="dark-select"
             @change="handleCourseChange"
           >
             <el-option
@@ -30,7 +29,6 @@
             filterable
             clearable
             style="width: 100%"
-            class="dark-select"
             @change="handleClassChange"
           >
             <el-option
@@ -44,15 +42,24 @@
         <el-col :span="12">
           <div class="filter-label">&nbsp;</div>
           <div class="filter-actions">
-            <el-button
-              type="warning"
-              icon="el-icon-upload2"
-              size="small"
-              @click="importDialogVisible = true"
-              :disabled="!selectedCourse"
+            <el-upload
+              action=""
+              :auto-upload="false"
+              :show-file-list="false"
+              accept=".xlsx,.xls"
+              :on-change="handleOneClickImport"
+              style="display: inline-block;"
             >
-              批量导入
-            </el-button>
+              <el-button
+                type="warning"
+                icon="el-icon-upload2"
+                size="small"
+                :disabled="!selectedCourse"
+                :loading="importLoading"
+              >
+                一键导入
+              </el-button>
+            </el-upload>
             <el-button
               type="success"
               icon="el-icon-check"
@@ -69,7 +76,7 @@
     </div>
 
     <!-- Score Table -->
-    <div class="dark-card table-section" v-loading="tableLoading" element-loading-background="rgba(30, 41, 59, 0.8)">
+    <div class="light-card table-section" v-loading="tableLoading" element-loading-background="rgba(255, 255, 255, 0.8)">
       <div class="card-header">
         <span class="card-title">
           成绩评价表
@@ -83,9 +90,6 @@
         v-if="selectedCourse && selectedClass"
         :data="scoreData"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="tableHeaderStyle"
-        :cell-style="tableCellStyle"
         border
         empty-text="暂无学生数据"
       >
@@ -139,7 +143,6 @@
       :title="'编辑成绩 - ' + editDialog.dimName"
       :visible.sync="editDialog.visible"
       width="400px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
       <div class="edit-dialog-content">
@@ -155,7 +158,6 @@
             :max="100"
             :precision="1"
             :step="1"
-            class="dark-input-number"
           ></el-input-number>
         </div>
       </div>
@@ -170,7 +172,6 @@
       title="编辑学生全部成绩"
       :visible.sync="fullEditDialog.visible"
       width="520px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
       <div class="full-edit-content">
@@ -178,7 +179,7 @@
           <span class="edit-label">学生：</span>
           <span class="edit-value">{{ fullEditDialog.studentName }} ({{ fullEditDialog.studentNo }})</span>
         </div>
-        <el-form label-width="100px" class="dark-form">
+        <el-form label-width="100px">
           <el-form-item v-for="dim in dimensions" :key="dim.id" :label="dim.name">
             <el-input-number
               v-model="fullEditDialog.scores[dim.id]"
@@ -187,7 +188,6 @@
               :precision="1"
               :step="1"
               style="width: 100%"
-              class="dark-input-number"
             ></el-input-number>
           </el-form-item>
         </el-form>
@@ -198,46 +198,7 @@
       </div>
     </el-dialog>
 
-    <!-- Import Dialog -->
-    <el-dialog
-      title="批量导入成绩"
-      :visible.sync="importDialogVisible"
-      width="500px"
-      custom-class="dark-dialog"
-      :close-on-click-modal="false"
-    >
-      <div class="import-content">
-        <div class="import-tips">
-          <p><i class="el-icon-info"></i> Excel文件格式要求：</p>
-          <ul>
-            <li>第一列：学号 (studentNo)</li>
-            <li>第二列起：考勤、作业、实验、测验、课堂参与</li>
-            <li>分值范围 0-100</li>
-          </ul>
-        </div>
-        <el-upload
-          ref="importUpload"
-          action=""
-          :auto-upload="false"
-          :limit="1"
-          accept=".xlsx,.xls"
-          :on-change="handleFileChange"
-          :file-list="importFileList"
-          drag
-          class="dark-upload"
-        >
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">只能上传 xlsx/xls 文件</div>
-        </el-upload>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="importDialogVisible = false" class="cancel-btn">取 消</el-button>
-        <el-button type="warning" @click="handleImport" :loading="importLoading" :disabled="!importFile">
-          开始导入
-        </el-button>
-      </div>
-    </el-dialog>
+    <!-- Full Edit Dialog -->
   </div>
 </template>
 
@@ -288,24 +249,7 @@ export default {
         loading: false
       },
       // Import
-      importDialogVisible: false,
-      importLoading: false,
-      importFile: null,
-      importFileList: [],
-      // Table style
-      tableHeaderStyle: {
-        background: '#162032',
-        color: '#94a3b8',
-        borderBottom: '1px solid #334155',
-        borderRight: '1px solid #334155',
-        fontWeight: '600'
-      },
-      tableCellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155',
-        borderRight: '1px solid #334155'
-      }
+      importLoading: false
     }
   },
   computed: {
@@ -551,15 +495,7 @@ export default {
       })
       student.weightedTotal = count > 0 ? (total / count).toFixed(1) : null
     },
-    handleFileChange(file) {
-      this.importFile = file.raw
-      this.importFileList = [file]
-    },
-    async handleImport() {
-      if (!this.importFile) {
-        this.$message.warning('请选择文件')
-        return
-      }
+    async handleOneClickImport(file) {
       if (!this.selectedCourse) {
         this.$message.warning('请先选择课程')
         return
@@ -569,17 +505,18 @@ export default {
       try {
         const teacherId = this.$store.state.userInfo ? this.$store.state.userInfo.id : null
         const formData = new FormData()
-        formData.append('file', this.importFile)
+        formData.append('file', file.raw)
         formData.append('courseId', this.selectedCourse)
         formData.append('teacherId', teacherId)
 
         const res = await importScores(formData)
-        this.$message.success(res.data.message || '导入成功')
-        this.importDialogVisible = false
-        this.importFile = null
-        this.importFileList = []
-        if (this.selectedClass) {
-          this.loadScores()
+        if (res.data.code === 200) {
+          this.$message.success(res.data.message || '导入成功')
+          if (this.selectedClass) {
+            this.loadScores()
+          }
+        } else {
+          this.$message.error(res.data.msg || '导入失败')
         }
       } catch (e) {
         this.$message.error('导入失败')
@@ -596,12 +533,13 @@ export default {
   padding: 0;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -614,7 +552,7 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .card-subtitle {
@@ -631,7 +569,7 @@ export default {
 
 .filter-label {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 6px;
 }
 
@@ -639,83 +577,6 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
-}
-
-/* Select Styles */
-.scores-page >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.scores-page >>> .el-input__inner:focus {
-  border-color: #f59e0b;
-}
-
-.scores-page >>> .el-input__inner::placeholder {
-  color: #475569;
-}
-
-/* Table Styles */
-.dark-table {
-  background: transparent !important;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__row:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #263348 !important;
-}
-
-.dark-table >>> th.el-table__cell {
-  background: #162032 !important;
-}
-
-.dark-table::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed-right::before,
-.dark-table >>> .el-table__fixed::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed,
-.dark-table >>> .el-table__fixed-right {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table--border .el-table__cell {
-  border-right: 1px solid #334155;
-}
-
-.dark-table >>> .el-table--border::after {
-  background-color: #334155;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 /* Score Cells */
@@ -731,38 +592,38 @@ export default {
 }
 
 .score-cell:hover {
-  background: rgba(245, 158, 11, 0.15);
+  background: rgba(97, 191, 173, 0.15);
 }
 
 .score-cell.modified {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  color: #61BFAD;
+  background: rgba(97, 191, 173, 0.1);
 }
 
 .score-edit-icon {
   font-size: 12px;
-  color: #475569;
+  color: #d1d5db;
   opacity: 0;
   transition: opacity 0.2s;
 }
 
 .score-cell:hover .score-edit-icon {
   opacity: 1;
-  color: #f59e0b;
+  color: #61BFAD;
 }
 
 .weighted-score {
   font-weight: 700;
-  color: #f59e0b;
+  color: #61BFAD;
   font-size: 15px;
 }
 
 .edit-btn {
-  color: #f59e0b !important;
+  color: #61BFAD !important;
 }
 
 .edit-btn:hover {
-  color: #fbbf24 !important;
+  color: #4ea899 !important;
 }
 
 /* Empty Hint */
@@ -777,38 +638,7 @@ export default {
   font-size: 32px;
   display: block;
   margin-bottom: 12px;
-  color: #475569;
-}
-
-/* Dialog Styles */
-.scores-page >>> .dark-dialog {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-}
-
-.scores-page >>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-  padding: 16px 20px;
-}
-
-.scores-page >>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.scores-page >>> .dark-dialog .el-dialog__headerbtn .el-dialog__close {
-  color: #94a3b8;
-}
-
-.scores-page >>> .dark-dialog .el-dialog__body {
-  padding: 20px;
-}
-
-.scores-page >>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-  padding: 12px 20px;
+  color: #d1d5db;
 }
 
 /* Edit Dialog */
@@ -825,12 +655,12 @@ export default {
 }
 
 .edit-label {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 14px;
 }
 
 .edit-value {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-weight: 500;
 }
 
@@ -840,58 +670,24 @@ export default {
   gap: 12px;
 }
 
-/* Form Styles */
-.dark-form >>> .el-form-item__label {
-  color: #94a3b8;
-}
-
-.dark-form >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.dark-form >>> .el-input__inner:focus {
-  border-color: #f59e0b;
-}
-
-/* Input Number */
-.scores-page >>> .el-input-number .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.scores-page >>> .el-input-number__decrease,
-.scores-page >>> .el-input-number__increase {
-  background: #162032;
-  border-color: #334155;
-  color: #94a3b8;
-}
-
-.scores-page >>> .el-input-number__decrease:hover,
-.scores-page >>> .el-input-number__increase:hover {
-  color: #f59e0b;
-}
-
 /* Import Content */
 .import-content {
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .import-tips {
-  background: #162032;
-  border: 1px solid #334155;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 20px;
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .import-tips p {
   margin: 0 0 8px 0;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .import-tips ul {
@@ -904,47 +700,20 @@ export default {
 }
 
 .import-tips i {
-  color: #f59e0b;
+  color: #61BFAD;
   margin-right: 4px;
-}
-
-/* Upload Styles */
-.scores-page >>> .dark-upload .el-upload-dragger {
-  background: #0f172a;
-  border-color: #334155;
-  border-radius: 8px;
-}
-
-.scores-page >>> .dark-upload .el-upload-dragger:hover {
-  border-color: #f59e0b;
-}
-
-.scores-page >>> .dark-upload .el-upload-dragger .el-icon-upload {
-  color: #475569;
-}
-
-.scores-page >>> .dark-upload .el-upload__text {
-  color: #94a3b8;
-}
-
-.scores-page >>> .dark-upload .el-upload__text em {
-  color: #f59e0b;
-}
-
-.scores-page >>> .dark-upload .el-upload__tip {
-  color: #475569;
 }
 
 .cancel-btn {
   background: transparent;
-  border-color: #475569;
-  color: #94a3b8;
+  border-color: #d1d5db;
+  color: #64748b;
 }
 
 .cancel-btn:hover {
-  background: #334155;
-  border-color: #475569;
-  color: #e2e8f0;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #2c3e50;
 }
 
 .dialog-footer {

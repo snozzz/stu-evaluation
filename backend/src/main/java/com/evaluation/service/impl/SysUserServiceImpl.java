@@ -46,6 +46,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new RuntimeException("账号已被禁用");
         }
 
+        // Validate role if provided
+        if (dto.getRole() != null && !dto.getRole().isEmpty()) {
+            if (!user.getRole().equals(dto.getRole())) {
+                throw new RuntimeException("身份选择错误");
+            }
+        }
+
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
 
         Map<String, Object> result = new HashMap<>();

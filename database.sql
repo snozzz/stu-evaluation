@@ -5,7 +5,7 @@
 -- 使用方法:
 --   mysql -u root -p < database.sql
 --
--- 包含: 建库 → 17张表 → 初始数据(配置/学期/用户/课程/班级/绑定/维度/权重/评分/评语/公告/预警)
+-- 包含: 建库 → 19张表 → 初始数据(配置/学期/用户/课程/班级/绑定/维度/权重/评分/评语/公告/预警/作业)
 -- ============================================================================
 
 DROP DATABASE IF EXISTS stu_evaluation;
@@ -304,6 +304,46 @@ CREATE TABLE alert_record (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- 18. 作业/实验布置表
+-- ============================================================================
+CREATE TABLE assignment (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  course_id BIGINT NOT NULL,
+  teacher_id BIGINT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT DEFAULT NULL,
+  type ENUM('HOMEWORK','EXPERIMENT') NOT NULL,
+  due_date DATETIME DEFAULT NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY course_id (course_id),
+  KEY teacher_id (teacher_id),
+  CONSTRAINT assignment_ibfk_1 FOREIGN KEY (course_id) REFERENCES course (id),
+  CONSTRAINT assignment_ibfk_2 FOREIGN KEY (teacher_id) REFERENCES sys_user (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- 19. 学生作业提交表
+-- ============================================================================
+CREATE TABLE assignment_submission (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  assignment_id BIGINT NOT NULL,
+  student_id BIGINT NOT NULL,
+  file_url VARCHAR(500) DEFAULT NULL,
+  content TEXT DEFAULT NULL,
+  submit_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('SUBMITTED','GRADED') DEFAULT 'SUBMITTED',
+  score DECIMAL(5,2) DEFAULT NULL,
+  feedback TEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_as (assignment_id, student_id),
+  KEY assignment_id (assignment_id),
+  KEY student_id (student_id),
+  CONSTRAINT assignment_submission_ibfk_1 FOREIGN KEY (assignment_id) REFERENCES assignment (id),
+  CONSTRAINT assignment_submission_ibfk_2 FOREIGN KEY (student_id) REFERENCES sys_user (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- 初始数据
 -- ============================================================================
 
@@ -404,3 +444,9 @@ INSERT INTO alert_rule (name, rule_type, threshold, is_enabled) VALUES
   ('成绩偏低预警', 'SCORE_LOW',        60.00, 1),
   ('作业未交预警', 'HOMEWORK_MISSING',  1.00, 1),
   ('评价进度滞后', 'EVAL_DELAY',       50.00, 1);
+
+-- 作业/实验示例
+INSERT INTO assignment (course_id, teacher_id, title, description, type, due_date) VALUES
+  (1, 2, '第一次作业：线性表', '实现顺序表和链表的基本操作', 'HOMEWORK', '2026-03-15 23:59:59'),
+  (1, 2, '实验一：排序算法', '实现冒泡排序、快速排序并比较性能', 'EXPERIMENT', '2026-03-20 23:59:59'),
+  (3, 2, '第一次作业：SQL查询', '完成10道SQL查询练习题', 'HOMEWORK', '2026-03-18 23:59:59');

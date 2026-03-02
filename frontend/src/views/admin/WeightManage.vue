@@ -1,13 +1,12 @@
 <template>
   <div class="page-container">
-    <div class="dark-card">
+    <div class="light-card">
       <!-- Course Selector -->
       <div class="top-bar">
         <span class="page-title">课程评价权重配置</span>
         <el-select
           v-model="selectedCourseId"
           placeholder="请选择课程"
-          class="dark-select"
           style="width: 300px; margin-left: 20px;"
           filterable
           @change="handleCourseChange"
@@ -181,11 +180,12 @@ export default {
   padding: 20px;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .top-bar {
@@ -193,13 +193,13 @@ export default {
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .page-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .weight-section {
@@ -212,7 +212,7 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   font-size: 15px;
-  color: #e2e8f0;
+  color: #2c3e50;
   font-weight: 500;
 }
 
@@ -222,7 +222,7 @@ export default {
 }
 
 .weight-ok {
-  color: #10b981;
+  color: #61BFAD;
 }
 
 .weight-warning {
@@ -245,14 +245,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: #0f172a;
+  background: #f9fafb;
   border-radius: 8px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   transition: border-color 0.2s;
 }
 
 .weight-item:hover {
-  border-color: #10b981;
+  border-color: #61BFAD;
 }
 
 .dimension-info {
@@ -263,7 +263,7 @@ export default {
 
 .dimension-name {
   font-size: 15px;
-  color: #e2e8f0;
+  color: #2c3e50;
   font-weight: 500;
 }
 
@@ -294,27 +294,5 @@ export default {
   text-align: center;
   padding: 60px 0;
   font-size: 14px;
-}
-
->>> .dark-select .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
->>> .el-input-number .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .el-input-number .el-input-number__decrease,
->>> .el-input-number .el-input-number__increase {
-  background: #334155;
-  border-color: #334155;
-  color: #e2e8f0;
-}
->>> .el-input-number .el-input-number__decrease:hover,
->>> .el-input-number .el-input-number__increase:hover {
-  color: #10b981;
 }
 </style>

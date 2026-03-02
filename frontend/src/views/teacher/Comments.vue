@@ -1,7 +1,7 @@
 <template>
   <div class="comments-page">
     <!-- Top Filters -->
-    <div class="dark-card filter-section">
+    <div class="light-card filter-section">
       <el-row :gutter="16" type="flex" align="middle">
         <el-col :span="6">
           <div class="filter-label">选择课程</div>
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Comment Editor Section -->
-    <div v-if="selectedStudent && selectedCourse" class="dark-card comment-section">
+    <div v-if="selectedStudent && selectedCourse" class="light-card comment-section">
       <div class="card-header">
         <span class="card-title">
           评语管理
@@ -73,34 +73,10 @@
             v-if="currentComment.id"
             :type="currentComment.isPublished === 1 ? 'success' : 'info'"
             size="small"
-            effect="dark"
           >
             {{ currentComment.isPublished === 1 ? '已发布' : '未发布' }}
           </el-tag>
         </div>
-      </div>
-
-      <!-- AI Comment Area -->
-      <div class="ai-section">
-        <div class="section-label">
-          <i class="el-icon-magic-stick"></i> AI 生成评语
-        </div>
-        <div class="ai-result" v-if="aiComment">
-          <div class="ai-comment-text">{{ aiComment }}</div>
-          <el-button type="text" size="small" class="use-ai-btn" @click="useAIComment">
-            <i class="el-icon-document-copy"></i> 使用此评语
-          </el-button>
-        </div>
-        <el-button
-          type="warning"
-          size="small"
-          icon="el-icon-magic-stick"
-          @click="handleGenerateAI"
-          :loading="aiLoading"
-          class="ai-generate-btn"
-        >
-          AI生成评语
-        </el-button>
       </div>
 
       <!-- Manual Comment Area -->
@@ -112,8 +88,7 @@
           v-model="commentText"
           type="textarea"
           :rows="6"
-          placeholder="请输入评语内容，或使用AI生成后修改..."
-          class="dark-textarea"
+          placeholder="请输入评语内容..."
           maxlength="1000"
           show-word-limit
         ></el-input>
@@ -122,7 +97,7 @@
       <!-- Action Buttons -->
       <div class="comment-actions">
         <el-button
-          type="warning"
+          type="primary"
           icon="el-icon-check"
           @click="handleSaveComment"
           :loading="saveLoading"
@@ -142,7 +117,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="dark-card empty-section">
+    <div v-else class="light-card empty-section">
       <div class="empty-hint">
         <i class="el-icon-chat-line-round"></i>
         <span>请选择课程和学生以管理评语</span>
@@ -150,16 +125,13 @@
     </div>
 
     <!-- Comment History -->
-    <div v-if="commentHistory.length > 0" class="dark-card history-section">
+    <div v-if="commentHistory.length > 0" class="light-card history-section">
       <div class="card-header">
         <span class="card-title">该课程评语列表</span>
       </div>
       <el-table
         :data="commentHistory"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="tableHeaderStyle"
-        :cell-style="tableCellStyle"
       >
         <el-table-column label="学生" width="120">
           <template slot-scope="scope">
@@ -172,7 +144,6 @@
             <el-tag
               :type="scope.row.isPublished === 1 ? 'success' : 'info'"
               size="small"
-              effect="dark"
             >
               {{ scope.row.isPublished === 1 ? '已发布' : '未发布' }}
             </el-tag>
@@ -193,7 +164,6 @@ import {
   getBindings,
   getComments,
   saveComment,
-  generateAIComment,
   publishComment,
   getCourseList,
   getClassList,
@@ -212,26 +182,13 @@ export default {
       selectedClass: null,
       selectedStudent: null,
       commentText: '',
-      aiComment: '',
-      aiLoading: false,
       saveLoading: false,
       publishLoading: false,
       currentComment: {
         id: null,
         isPublished: 0
       },
-      commentHistory: [],
-      tableHeaderStyle: {
-        background: '#162032',
-        color: '#94a3b8',
-        borderBottom: '1px solid #334155',
-        fontWeight: '600'
-      },
-      tableCellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
-      }
+      commentHistory: []
     }
   },
   computed: {
@@ -326,9 +283,6 @@ export default {
             isPublished: latest.isPublished || 0
           }
           this.commentText = latest.comment || ''
-          if (latest.aiComment) {
-            this.aiComment = latest.aiComment
-          }
         }
       } catch (e) {
         console.error('Load comment error:', e)
@@ -352,32 +306,7 @@ export default {
     },
     resetComment() {
       this.commentText = ''
-      this.aiComment = ''
       this.currentComment = { id: null, isPublished: 0 }
-    },
-    async handleGenerateAI() {
-      if (!this.selectedStudent || !this.selectedCourse) {
-        this.$message.warning('请先选择课程和学生')
-        return
-      }
-
-      this.aiLoading = true
-      try {
-        const res = await generateAIComment({
-          studentId: this.selectedStudent,
-          courseId: this.selectedCourse
-        })
-        this.aiComment = res.data.data || ''
-        this.$message.success('AI评语生成成功')
-      } catch (e) {
-        this.$message.error('AI评语生成失败，请稍后重试')
-      } finally {
-        this.aiLoading = false
-      }
-    },
-    useAIComment() {
-      this.commentText = this.aiComment
-      this.$message.success('已填入AI评语，可继续编辑')
     },
     async handleSaveComment() {
       if (!this.commentText.trim()) {
@@ -393,7 +322,6 @@ export default {
           courseId: this.selectedCourse,
           teacherId: teacherId,
           comment: this.commentText.trim(),
-          aiComment: this.aiComment || null,
           isPublished: 0
         }
         if (this.currentComment.id) {
@@ -402,7 +330,6 @@ export default {
 
         await saveComment(data)
         this.$message.success('评语保存成功')
-        // Reload to get the new id
         await this.loadExistingComment()
         this.loadCommentHistory()
       } catch (e) {
@@ -452,12 +379,13 @@ export default {
   padding: 0;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -470,13 +398,13 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .student-tag {
   display: inline-block;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: rgba(97, 191, 173, 0.15);
+  color: #61BFAD;
   padding: 2px 10px;
   border-radius: 12px;
   font-size: 13px;
@@ -491,72 +419,8 @@ export default {
 
 .filter-label {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 6px;
-}
-
-/* Select Styles */
-.comments-page >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.comments-page >>> .el-input__inner:focus {
-  border-color: #f59e0b;
-}
-
-.comments-page >>> .el-input__inner::placeholder {
-  color: #475569;
-}
-
-/* AI Section */
-.ai-section {
-  margin-bottom: 20px;
-  padding: 16px;
-  background: #162032;
-  border-radius: 10px;
-  border: 1px solid #334155;
-}
-
-.section-label {
-  font-size: 14px;
-  color: #f59e0b;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.section-label i {
-  margin-right: 4px;
-}
-
-.ai-result {
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 12px;
-  position: relative;
-}
-
-.ai-comment-text {
-  color: #cbd5e1;
-  font-size: 14px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-}
-
-.use-ai-btn {
-  color: #f59e0b !important;
-  margin-top: 8px;
-}
-
-.use-ai-btn:hover {
-  color: #fbbf24 !important;
-}
-
-.ai-generate-btn {
-  border-radius: 8px;
 }
 
 /* Manual Section */
@@ -564,31 +428,15 @@ export default {
   margin-bottom: 20px;
 }
 
-.manual-section .section-label {
-  color: #94a3b8;
-}
-
-/* Textarea Styles */
-.comments-page >>> .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-  border-radius: 8px;
+.section-label {
   font-size: 14px;
-  line-height: 1.7;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
-.comments-page >>> .el-textarea__inner:focus {
-  border-color: #f59e0b;
-}
-
-.comments-page >>> .el-textarea__inner::placeholder {
-  color: #475569;
-}
-
-.comments-page >>> .el-input__count {
-  background: transparent;
-  color: #475569;
+.section-label i {
+  margin-right: 4px;
 }
 
 /* Action Buttons */
@@ -606,7 +454,7 @@ export default {
 .empty-hint {
   text-align: center;
   padding: 60px 20px;
-  color: #64748b;
+  color: #9ca3af;
   font-size: 14px;
 }
 
@@ -614,36 +462,6 @@ export default {
   font-size: 40px;
   display: block;
   margin-bottom: 12px;
-  color: #475569;
-}
-
-/* Table Styles */
-.dark-table {
-  background: transparent !important;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__row:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #263348 !important;
-}
-
-.dark-table >>> th.el-table__cell {
-  background: #162032 !important;
-}
-
-.dark-table::before {
-  display: none;
+  color: #d1d5db;
 }
 </style>

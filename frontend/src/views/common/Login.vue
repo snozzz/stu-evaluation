@@ -1,13 +1,7 @@
 <template>
   <div class="login-page">
-    <!-- Animated background decorations -->
-    <div class="bg-decoration">
-      <div class="circle circle-1"></div>
-      <div class="circle circle-2"></div>
-      <div class="circle circle-3"></div>
-      <div class="circle circle-4"></div>
-      <div class="circle circle-5"></div>
-    </div>
+    <!-- Particle canvas background -->
+    <canvas ref="particleCanvas" class="particle-canvas"></canvas>
 
     <!-- Login Card -->
     <div class="login-card">
@@ -28,12 +22,23 @@
         class="login-form"
         @submit.native.prevent="handleLogin"
       >
+        <el-form-item prop="role">
+          <el-select
+            v-model="form.role"
+            placeholder="请选择身份"
+            style="width: 100%"
+            class="role-select"
+          >
+            <el-option label="管理员" value="ADMIN"></el-option>
+            <el-option label="教师" value="TEACHER"></el-option>
+            <el-option label="学生" value="STUDENT"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
             placeholder="请输入用户名"
             prefix-icon="el-icon-user"
-            class="dark-input"
           />
         </el-form-item>
         <el-form-item prop="password">
@@ -43,7 +48,6 @@
             placeholder="请输入密码"
             prefix-icon="el-icon-lock"
             show-password
-            class="dark-input"
             @keyup.enter.native="handleLogin"
           />
         </el-form-item>
@@ -69,9 +73,13 @@ export default {
     return {
       form: {
         username: '',
-        password: ''
+        password: '',
+        role: ''
       },
       rules: {
+        role: [
+          { required: true, message: '请选择身份', trigger: 'change' }
+        ],
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
@@ -79,7 +87,17 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' }
         ]
       },
-      loading: false
+      loading: false,
+      particles: [],
+      animationId: null
+    }
+  },
+  mounted() {
+    this.initParticles()
+  },
+  beforeDestroy() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId)
     }
   },
   methods: {
@@ -103,6 +121,72 @@ export default {
           this.loading = false
         })
       })
+    },
+    initParticles() {
+      const canvas = this.$refs.particleCanvas
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      const resize = () => {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
+      resize()
+      window.addEventListener('resize', resize)
+
+      // Create particles
+      const count = 60
+      this.particles = []
+      for (let i = 0; i < count; i++) {
+        this.particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          r: Math.random() * 2 + 1,
+          opacity: Math.random() * 0.5 + 0.2
+        })
+      }
+
+      const animate = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        // Update and draw particles
+        for (let i = 0; i < this.particles.length; i++) {
+          const p = this.particles[i]
+          p.x += p.vx
+          p.y += p.vy
+
+          // Wrap around
+          if (p.x < 0) p.x = canvas.width
+          if (p.x > canvas.width) p.x = 0
+          if (p.y < 0) p.y = canvas.height
+          if (p.y > canvas.height) p.y = 0
+
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(97, 191, 173, ${p.opacity})`
+          ctx.fill()
+
+          // Draw connections
+          for (let j = i + 1; j < this.particles.length; j++) {
+            const q = this.particles[j]
+            const dx = p.x - q.x
+            const dy = p.y - q.y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 120) {
+              ctx.beginPath()
+              ctx.moveTo(p.x, p.y)
+              ctx.lineTo(q.x, q.y)
+              ctx.strokeStyle = `rgba(97, 191, 173, ${0.15 * (1 - dist / 120)})`
+              ctx.lineWidth = 0.5
+              ctx.stroke()
+            }
+          }
+        }
+
+        this.animationId = requestAnimationFrame(animate)
+      }
+      animate()
     }
   }
 }
@@ -115,109 +199,28 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #e8f5f1 0%, #f5f5f5 50%, #e0f2ee 100%);
   position: relative;
   overflow: hidden;
 }
 
-/* Background floating circles */
-.bg-decoration {
+.particle-canvas {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  overflow: hidden;
+  z-index: 1;
 }
 
-.circle {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.07;
-}
-
-.circle-1 {
-  width: 400px;
-  height: 400px;
-  background: #10b981;
-  top: -100px;
-  right: -100px;
-  animation: float-1 20s ease-in-out infinite;
-}
-
-.circle-2 {
-  width: 300px;
-  height: 300px;
-  background: #f59e0b;
-  bottom: -80px;
-  left: -80px;
-  animation: float-2 25s ease-in-out infinite;
-}
-
-.circle-3 {
-  width: 200px;
-  height: 200px;
-  background: #f472b6;
-  top: 50%;
-  left: 10%;
-  animation: float-3 18s ease-in-out infinite;
-}
-
-.circle-4 {
-  width: 150px;
-  height: 150px;
-  background: #10b981;
-  bottom: 20%;
-  right: 15%;
-  animation: float-4 22s ease-in-out infinite;
-}
-
-.circle-5 {
-  width: 100px;
-  height: 100px;
-  background: #f59e0b;
-  top: 20%;
-  left: 40%;
-  animation: float-5 15s ease-in-out infinite;
-}
-
-@keyframes float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-60px, 40px) scale(1.1); }
-  66% { transform: translate(30px, -20px) scale(0.95); }
-}
-
-@keyframes float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(50px, -30px) scale(1.05); }
-  66% { transform: translate(-40px, 50px) scale(0.9); }
-}
-
-@keyframes float-3 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(80px, -60px); }
-}
-
-@keyframes float-4 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-50px, 40px); }
-}
-
-@keyframes float-5 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, 30px) scale(1.2); }
-}
-
-/* Login Card - Glass morphism */
+/* Login Card */
 .login-card {
   width: 420px;
   padding: 48px 40px 36px;
-  background: rgba(30, 41, 59, 0.65);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  border: 1px solid #e5e7eb;
   border-radius: 20px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 10;
 }
@@ -232,30 +235,27 @@ export default {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #61BFAD, #4da89a);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
   color: #fff;
   margin-bottom: 16px;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 16px rgba(97, 191, 173, 0.3);
 }
 
 .title {
   font-size: 24px;
   font-weight: 700;
   margin: 0 0 8px;
-  background: linear-gradient(135deg, #10b981, #34d399, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #2c3e50;
   letter-spacing: 1px;
 }
 
 .subtitle {
   font-size: 13px;
-  color: #64748b;
+  color: #9ca3af;
   margin: 0;
   letter-spacing: 0.5px;
 }
@@ -269,12 +269,11 @@ export default {
   margin-bottom: 22px;
 }
 
-/* Dark input styling */
 .login-form >>> .el-input__inner {
-  background: rgba(15, 15, 26, 0.6);
-  border: 1px solid #334155;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
-  color: #e2e8f0;
+  color: #2c3e50;
   height: 46px;
   font-size: 14px;
   padding-left: 40px;
@@ -282,33 +281,38 @@ export default {
 }
 
 .login-form >>> .el-input__inner::placeholder {
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .login-form >>> .el-input__inner:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  border-color: #61BFAD;
+  box-shadow: 0 0 0 3px rgba(97, 191, 173, 0.15);
 }
 
 .login-form >>> .el-input__prefix {
   left: 12px;
-  color: #64748b;
+  color: #9ca3af;
   font-size: 16px;
   display: flex;
   align-items: center;
 }
 
 .login-form >>> .el-input__suffix {
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .login-form >>> .el-input__suffix .el-input__icon {
-  color: #64748b;
+  color: #9ca3af;
+}
+
+/* Role select */
+.role-select >>> .el-input__inner {
+  padding-left: 15px;
 }
 
 /* Form item error states */
 .login-form >>> .el-form-item__error {
-  color: #f87171;
+  color: #ef4444;
   font-size: 12px;
   padding-top: 4px;
 }
@@ -326,21 +330,21 @@ export default {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 4px;
-  background: linear-gradient(135deg, #10b981, #059669) !important;
+  background: linear-gradient(135deg, #61BFAD, #4da89a) !important;
   color: #fff !important;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 16px rgba(97, 191, 173, 0.3);
 }
 
 .login-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
-  background: linear-gradient(135deg, #34d399, #10b981) !important;
+  box-shadow: 0 6px 24px rgba(97, 191, 173, 0.4);
+  background: linear-gradient(135deg, #4da89a, #61BFAD) !important;
 }
 
 .login-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(97, 191, 173, 0.3);
 }
 </style>

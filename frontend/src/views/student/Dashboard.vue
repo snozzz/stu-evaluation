@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <!-- Carousel -->
-    <div class="dark-card carousel-card" v-if="carousels.length > 0">
+    <div class="light-card carousel-card" v-if="carousels.length > 0">
       <el-carousel height="280px" :interval="4000" arrow="hover" indicator-position="outside">
         <el-carousel-item v-for="item in carousels" :key="item.id">
           <a :href="item.linkUrl || 'javascript:;'" class="carousel-link">
@@ -75,7 +75,7 @@
     <el-row :gutter="20">
       <!-- Radar Chart -->
       <el-col :span="16">
-        <div class="dark-card">
+        <div class="light-card">
           <div class="card-header">
             <span>能力维度雷达图</span>
             <el-select
@@ -102,7 +102,7 @@
 
       <!-- Announcements & Alerts -->
       <el-col :span="8">
-        <div class="dark-card">
+        <div class="light-card">
           <div class="card-header">
             <span>最新公告</span>
           </div>
@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { getDashboardStats, getStudentScores, getDimensions, getAnnouncements, getAlertRecords, getCarousels, getCourseList } from '../../api'
+import { getDashboardStats, getStudentScores, getDimensions, getAnnouncements, getStudentAlerts, getCarousels, getCourseList } from '../../api'
 import * as echarts from 'echarts'
 
 export default {
@@ -262,19 +262,11 @@ export default {
     },
     async fetchAlertRecords() {
       try {
-        const res = await getAlertRecords({ userId: this.userId })
+        const res = await getStudentAlerts(this.userId)
         if (res.data.code === 200) {
-          const data = res.data.data
-          if (Array.isArray(data)) {
-            this.alertRecords = data
-            this.alertCount = data.length
-          } else if (data && data.records) {
-            this.alertRecords = data.records
-            this.alertCount = data.total || data.records.length
-          } else {
-            this.alertRecords = []
-            this.alertCount = 0
-          }
+          const data = res.data.data || []
+          this.alertRecords = Array.isArray(data) ? data : []
+          this.alertCount = this.alertRecords.length
         }
       } catch (e) {
         console.error('获取异常提醒失败', e)
@@ -344,9 +336,9 @@ export default {
       const option = {
         backgroundColor: 'transparent',
         tooltip: {
-          backgroundColor: '#1e293b',
-          borderColor: '#334155',
-          textStyle: { color: '#e2e8f0' }
+          backgroundColor: '#ffffff',
+          borderColor: '#e5e7eb',
+          textStyle: { color: '#2c3e50' }
         },
         radar: {
           indicator: indicators,
@@ -354,23 +346,23 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: '#94a3b8',
+              color: '#64748b',
               fontSize: 12
             }
           },
           splitLine: {
-            lineStyle: { color: '#334155' }
+            lineStyle: { color: '#e5e7eb' }
           },
           splitArea: {
             show: true,
             areaStyle: {
-              color: ['rgba(236, 72, 153, 0.02)', 'rgba(236, 72, 153, 0.04)',
-                'rgba(236, 72, 153, 0.06)', 'rgba(236, 72, 153, 0.08)',
-                'rgba(236, 72, 153, 0.1)']
+              color: ['rgba(97, 191, 173, 0.02)', 'rgba(97, 191, 173, 0.04)',
+                'rgba(97, 191, 173, 0.06)', 'rgba(97, 191, 173, 0.08)',
+                'rgba(97, 191, 173, 0.1)']
             }
           },
           axisLine: {
-            lineStyle: { color: '#334155' }
+            lineStyle: { color: '#e5e7eb' }
           }
         },
         series: [{
@@ -381,18 +373,18 @@ export default {
             symbol: 'circle',
             symbolSize: 6,
             lineStyle: {
-              color: '#ec4899',
+              color: '#61BFAD',
               width: 2
             },
             areaStyle: {
               color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
-                { offset: 0, color: 'rgba(236, 72, 153, 0.3)' },
-                { offset: 1, color: 'rgba(236, 72, 153, 0.05)' }
+                { offset: 0, color: 'rgba(97, 191, 173, 0.3)' },
+                { offset: 1, color: 'rgba(97, 191, 173, 0.05)' }
               ])
             },
             itemStyle: {
-              color: '#ec4899',
-              borderColor: '#ec4899',
+              color: '#61BFAD',
+              borderColor: '#61BFAD',
               borderWidth: 2
             }
           }]
@@ -413,7 +405,7 @@ export default {
 
 /* Welcome Banner */
 .welcome-banner {
-  background: linear-gradient(135deg, #ec4899, #f472b6, #be185d);
+  background: linear-gradient(135deg, #61BFAD, #4da89a);
   border-radius: 12px;
   padding: 28px 32px;
   margin-bottom: 20px;
@@ -431,7 +423,7 @@ export default {
   right: -5%;
   width: 200px;
   height: 200px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 50%;
 }
 
@@ -442,7 +434,7 @@ export default {
   right: 10%;
   width: 150px;
   height: 150px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 50%;
 }
 
@@ -459,14 +451,14 @@ export default {
 }
 
 .welcome-sub {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 14px;
   margin: 0;
 }
 
 .welcome-decoration {
   font-size: 64px;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.2);
   position: relative;
   z-index: 1;
 }
@@ -483,7 +475,7 @@ export default {
   align-items: center;
   color: #fff;
   min-height: 100px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
 }
 
@@ -492,11 +484,11 @@ export default {
 }
 
 .pink-gradient {
-  background: linear-gradient(135deg, #ec4899, #be185d);
+  background: linear-gradient(135deg, #61BFAD, #4da89a);
 }
 
 .green-gradient {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .amber-gradient {
@@ -529,22 +521,23 @@ export default {
   margin-top: 4px;
 }
 
-/* Dark Card */
-.dark-card {
-  background: #1e293b;
+/* Light Card */
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -552,16 +545,6 @@ export default {
 
 .course-select {
   width: 180px;
-}
-
-.course-select >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-.course-select >>> .el-input__inner:focus {
-  border-color: #ec4899;
 }
 
 .chart-container {
@@ -586,7 +569,7 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
 }
 
@@ -598,7 +581,7 @@ export default {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ec4899;
+  background: #61BFAD;
   margin-top: 6px;
   margin-right: 12px;
   flex-shrink: 0;
@@ -610,7 +593,7 @@ export default {
 }
 
 .announcement-title {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 13px;
   line-height: 1.5;
   overflow: hidden;
@@ -619,7 +602,7 @@ export default {
 }
 
 .announcement-time {
-  color: #64748b;
+  color: #9ca3af;
   font-size: 12px;
   margin-top: 4px;
 }
@@ -638,7 +621,7 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .alert-item:last-child {
@@ -659,19 +642,19 @@ export default {
 }
 
 .alert-title {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 13px;
   line-height: 1.5;
 }
 
 .alert-time {
-  color: #64748b;
+  color: #9ca3af;
   font-size: 12px;
   margin-top: 4px;
 }
 
 .empty-text {
-  color: #64748b;
+  color: #9ca3af;
   text-align: center;
   padding: 30px 0;
   font-size: 14px;
@@ -686,10 +669,10 @@ export default {
   margin-top: -10px;
 }
 .carousel-card >>> .el-carousel__indicator .el-carousel__button {
-  background: #475569;
+  background: #d1d5db;
 }
 .carousel-card >>> .el-carousel__indicator.is-active .el-carousel__button {
-  background: #ec4899;
+  background: #61BFAD;
 }
 .carousel-link {
   display: block;

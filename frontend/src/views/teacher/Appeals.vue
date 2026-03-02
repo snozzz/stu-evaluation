@@ -1,6 +1,6 @@
 <template>
   <div class="appeals-page">
-    <div class="dark-card">
+    <div class="light-card">
       <div class="card-header">
         <span class="card-title">学生反馈与申诉</span>
         <div class="header-stats">
@@ -13,11 +13,8 @@
       <el-table
         :data="appeals"
         style="width: 100%"
-        class="dark-table"
-        :header-cell-style="tableHeaderStyle"
-        :cell-style="tableCellStyle"
         v-loading="loading"
-        element-loading-background="rgba(30, 41, 59, 0.8)"
+        element-loading-background="rgba(255, 255, 255, 0.8)"
         empty-text="暂无申诉记录"
       >
         <el-table-column type="index" label="#" width="50"></el-table-column>
@@ -79,7 +76,6 @@
       title="处理申诉"
       :visible.sync="replyDialog.visible"
       width="560px"
-      custom-class="dark-dialog"
       :close-on-click-modal="false"
     >
       <div class="reply-dialog-content">
@@ -166,17 +162,6 @@ export default {
         existingReply: '',
         replyText: '',
         loading: false
-      },
-      tableHeaderStyle: {
-        background: '#162032',
-        color: '#94a3b8',
-        borderBottom: '1px solid #334155',
-        fontWeight: '600'
-      },
-      tableCellStyle: {
-        background: '#1e293b',
-        color: '#e2e8f0',
-        borderBottom: '1px solid #334155'
       }
     }
   },
@@ -263,11 +248,12 @@ export default {
   padding: 0;
 }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -280,118 +266,33 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
 }
 
 .student-name {
-  color: #f59e0b;
+  color: #61BFAD;
   font-weight: 500;
 }
 
 .appeal-content {
-  color: #cbd5e1;
+  color: #4a5568;
 }
 
 .reply-text {
-  color: #10b981;
+  color: #61BFAD;
 }
 
 .no-reply {
-  color: #475569;
+  color: #d1d5db;
   font-style: italic;
 }
 
 .reply-btn {
-  color: #f59e0b !important;
+  color: #61BFAD !important;
 }
 
 .reply-btn:hover {
-  color: #fbbf24 !important;
-}
-
-/* Table Styles */
-.dark-table {
-  background: transparent !important;
-}
-
-.dark-table >>> .el-table__body-wrapper {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__empty-block {
-  background: #1e293b;
-  color: #64748b;
-}
-
-.dark-table >>> .el-table__row:hover > td {
-  background: #263348 !important;
-}
-
-.dark-table >>> .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #263348 !important;
-}
-
-.dark-table >>> th.el-table__cell {
-  background: #162032 !important;
-}
-
-.dark-table::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed-right::before,
-.dark-table >>> .el-table__fixed::before {
-  display: none;
-}
-
-.dark-table >>> .el-table__fixed,
-.dark-table >>> .el-table__fixed-right {
-  background: #1e293b;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 6px;
-}
-
-.dark-table >>> .el-table__body-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Dialog Styles */
-.appeals-page >>> .dark-dialog {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-}
-
-.appeals-page >>> .dark-dialog .el-dialog__header {
-  border-bottom: 1px solid #334155;
-  padding: 16px 20px;
-}
-
-.appeals-page >>> .dark-dialog .el-dialog__title {
-  color: #e2e8f0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.appeals-page >>> .dark-dialog .el-dialog__headerbtn .el-dialog__close {
-  color: #94a3b8;
-}
-
-.appeals-page >>> .dark-dialog .el-dialog__body {
-  padding: 20px;
-}
-
-.appeals-page >>> .dark-dialog .el-dialog__footer {
-  border-top: 1px solid #334155;
-  padding: 12px 20px;
+  color: #4ea899 !important;
 }
 
 /* Reply Dialog Content */
@@ -406,9 +307,9 @@ export default {
   flex-wrap: wrap;
   gap: 16px;
   padding: 12px 16px;
-  background: #162032;
+  background: #f9fafb;
   border-radius: 8px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
 }
 
 .info-row {
@@ -423,64 +324,43 @@ export default {
 }
 
 .info-value {
-  color: #e2e8f0;
+  color: #2c3e50;
   font-size: 13px;
   font-weight: 500;
 }
 
 .block-label {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .block-text {
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 12px 14px;
-  color: #cbd5e1;
+  color: #4a5568;
   font-size: 14px;
   line-height: 1.6;
 }
 
 .reply-existing {
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-/* Textarea in Dialog */
-.appeals-page >>> .el-textarea__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-  border-radius: 8px;
-}
-
-.appeals-page >>> .el-textarea__inner:focus {
-  border-color: #f59e0b;
-}
-
-.appeals-page >>> .el-textarea__inner::placeholder {
-  color: #475569;
-}
-
-.appeals-page >>> .el-input__count {
-  background: transparent;
-  color: #475569;
+  color: #61BFAD;
+  border-color: rgba(97, 191, 173, 0.3);
 }
 
 .cancel-btn {
   background: transparent;
-  border-color: #475569;
-  color: #94a3b8;
+  border-color: #d1d5db;
+  color: #64748b;
 }
 
 .cancel-btn:hover {
-  background: #334155;
-  border-color: #475569;
-  color: #e2e8f0;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #2c3e50;
 }
 
 .dialog-footer {

@@ -1,7 +1,7 @@
 <template>
   <div class="report-page">
     <!-- Filters -->
-    <div class="dark-card filter-section">
+    <div class="light-card filter-section">
       <el-row :gutter="16" type="flex" align="middle">
         <el-col :span="6">
           <div class="filter-label">选择课程</div>
@@ -10,7 +10,6 @@
             placeholder="请选择课程"
             filterable
             style="width: 100%"
-            class="dark-select"
             @change="handleCourseChange"
           >
             <el-option
@@ -28,7 +27,6 @@
             placeholder="请选择班级"
             filterable
             style="width: 100%"
-            class="dark-select"
             @change="handleClassChange"
           >
             <el-option
@@ -47,7 +45,6 @@
             filterable
             clearable
             style="width: 100%"
-            class="dark-select"
             @change="handleStudentChange"
           >
             <el-option
@@ -66,14 +63,14 @@
       <el-row :gutter="20">
         <!-- Pie: Class average by dimension -->
         <el-col :span="12">
-          <div class="dark-card chart-card">
+          <div class="light-card chart-card">
             <div class="card-header"><span>班级各维度平均分分布</span></div>
             <div ref="classPieChart" class="chart-box"></div>
           </div>
         </el-col>
         <!-- Bar: Each student's weighted total -->
         <el-col :span="12">
-          <div class="dark-card chart-card">
+          <div class="light-card chart-card">
             <div class="card-header"><span>学生加权总分排名</span></div>
             <div ref="classBarChart" class="chart-box"></div>
           </div>
@@ -81,7 +78,7 @@
       </el-row>
 
       <!-- Bar: Grouped bar - each dimension, all students -->
-      <div class="dark-card chart-card">
+      <div class="light-card chart-card">
         <div class="card-header"><span>各维度成绩对比</span></div>
         <div ref="classDimBarChart" class="chart-box-wide"></div>
       </div>
@@ -120,14 +117,14 @@
       <el-row :gutter="20">
         <!-- Radar: Student dimensions -->
         <el-col :span="12">
-          <div class="dark-card chart-card">
+          <div class="light-card chart-card">
             <div class="card-header"><span>{{ studentDetail.realName }} - 能力雷达图</span></div>
             <div ref="studentRadarChart" class="chart-box"></div>
           </div>
         </el-col>
         <!-- Bar: Student vs class average -->
         <el-col :span="12">
-          <div class="dark-card chart-card">
+          <div class="light-card chart-card">
             <div class="card-header"><span>个人成绩 vs 班级平均</span></div>
             <div ref="studentVsClassChart" class="chart-box"></div>
           </div>
@@ -135,14 +132,11 @@
       </el-row>
 
       <!-- Score Detail Table -->
-      <div class="dark-card">
+      <div class="light-card">
         <div class="card-header"><span>{{ studentDetail.realName }} 成绩明细</span></div>
         <el-table
           :data="studentScoreTable"
           style="width: 100%"
-          class="dark-table"
-          :header-cell-style="tableHeaderStyle"
-          :cell-style="tableCellStyle"
         >
           <el-table-column prop="dimName" label="评价维度" min-width="120"></el-table-column>
           <el-table-column prop="score" label="得分" width="100" align="center">
@@ -152,12 +146,12 @@
           </el-table-column>
           <el-table-column prop="classAvg" label="班级均分" width="100" align="center">
             <template slot-scope="scope">
-              <span style="color: #94a3b8;">{{ scope.row.classAvg }}</span>
+              <span style="color: #64748b;">{{ scope.row.classAvg }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="diff" label="差值" width="100" align="center">
             <template slot-scope="scope">
-              <span :style="{ color: scope.row.diff >= 0 ? '#10b981' : '#ef4444', fontWeight: 600 }">
+              <span :style="{ color: scope.row.diff >= 0 ? '#61BFAD' : '#ef4444', fontWeight: 600 }">
                 {{ scope.row.diff >= 0 ? '+' : '' }}{{ scope.row.diff }}
               </span>
             </template>
@@ -174,12 +168,12 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="!selectedCourse || !selectedClass" class="dark-card empty-state">
-      <i class="el-icon-pie-chart" style="font-size: 48px; color: #334155;"></i>
+    <div v-if="!selectedCourse || !selectedClass" class="light-card empty-state">
+      <i class="el-icon-pie-chart" style="font-size: 48px; color: #e5e7eb;"></i>
       <p>请选择课程和班级查看可视化报表</p>
     </div>
-    <div v-if="selectedCourse && selectedClass && scoreData.length === 0 && !selectedStudent" class="dark-card empty-state">
-      <i class="el-icon-warning-outline" style="font-size: 48px; color: #334155;"></i>
+    <div v-if="selectedCourse && selectedClass && scoreData.length === 0 && !selectedStudent" class="light-card empty-state">
+      <i class="el-icon-warning-outline" style="font-size: 48px; color: #e5e7eb;"></i>
       <p>该班级暂无成绩数据</p>
     </div>
   </div>
@@ -203,9 +197,7 @@ export default {
       selectedStudent: null,
       scoreData: [],
       studentList: [],
-      charts: [],
-      tableHeaderStyle: { background: '#162032', color: '#94a3b8', borderBottom: '1px solid #334155', fontWeight: '600' },
-      tableCellStyle: { background: '#1e293b', color: '#e2e8f0', borderBottom: '1px solid #334155' }
+      charts: []
     }
   },
   computed: {
@@ -387,15 +379,15 @@ export default {
           name: dim.name,
           value: Number(this.getDimAvg(dim.id).toFixed(1))
         }))
-        const colors = ['#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#3b82f6']
+        const colors = ['#61BFAD', '#61BFAD', '#8b5cf6', '#ef4444', '#3b82f6']
         pie.setOption({
           backgroundColor: 'transparent',
-          tooltip: { trigger: 'item', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0' }, formatter: '{b}: {c}分 ({d}%)' },
+          tooltip: { trigger: 'item', backgroundColor: '#ffffff', borderColor: '#e5e7eb', textStyle: { color: '#2c3e50' }, formatter: '{b}: {c}分 ({d}%)' },
           series: [{
             type: 'pie', radius: ['40%', '70%'], center: ['50%', '50%'],
-            itemStyle: { borderRadius: 8, borderColor: '#1e293b', borderWidth: 3 },
-            label: { color: '#e2e8f0', fontSize: 12, formatter: '{b}\n{c}分' },
-            labelLine: { lineStyle: { color: '#475569' } },
+            itemStyle: { borderRadius: 8, borderColor: '#ffffff', borderWidth: 3 },
+            label: { color: '#2c3e50', fontSize: 12, formatter: '{b}\n{c}分' },
+            labelLine: { lineStyle: { color: '#d1d5db' } },
             data: pieData.map((d, i) => ({ ...d, itemStyle: { color: colors[i % colors.length] } }))
           }]
         })
@@ -410,28 +402,28 @@ export default {
         })).sort((a, b) => b.value - a.value)
         bar.setOption({
           backgroundColor: 'transparent',
-          tooltip: { trigger: 'axis', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0' } },
+          tooltip: { trigger: 'axis', backgroundColor: '#ffffff', borderColor: '#e5e7eb', textStyle: { color: '#2c3e50' } },
           grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
           xAxis: {
             type: 'category', data: ranked.map(r => r.name),
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8', rotate: ranked.length > 6 ? 30 : 0 }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b', rotate: ranked.length > 6 ? 30 : 0 }
           },
           yAxis: {
             type: 'value', max: 100,
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
-            splitLine: { lineStyle: { color: '#1e293b' } }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' },
+            splitLine: { lineStyle: { color: '#e5e7eb' } }
           },
           series: [{
             type: 'bar', data: ranked.map(r => r.value), barWidth: '50%',
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#f59e0b' }, { offset: 1, color: '#d97706' }
+                { offset: 0, color: '#61BFAD' }, { offset: 1, color: '#4ea899' }
               ]),
               borderRadius: [6, 6, 0, 0]
             },
-            label: { show: true, position: 'top', color: '#f59e0b', fontSize: 12, formatter: '{c}' }
+            label: { show: true, position: 'top', color: '#61BFAD', fontSize: 12, formatter: '{c}' }
           }]
         })
       }
@@ -439,7 +431,7 @@ export default {
       // Grouped bar: dimensions x students
       const dimBar = this.initChart('classDimBarChart')
       if (dimBar) {
-        const seriesColors = ['#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#3b82f6', '#ec4899']
+        const seriesColors = ['#61BFAD', '#61BFAD', '#8b5cf6', '#ef4444', '#3b82f6', '#ec4899']
         const studentNames = this.scoreData.map(s => s.realName || s.studentNo)
         const series = this.dimensions.map((dim, i) => ({
           name: dim.name, type: 'bar',
@@ -448,19 +440,19 @@ export default {
         }))
         dimBar.setOption({
           backgroundColor: 'transparent',
-          tooltip: { trigger: 'axis', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0' } },
-          legend: { data: this.dimensions.map(d => d.name), textStyle: { color: '#94a3b8' }, top: 0 },
+          tooltip: { trigger: 'axis', backgroundColor: '#ffffff', borderColor: '#e5e7eb', textStyle: { color: '#2c3e50' } },
+          legend: { data: this.dimensions.map(d => d.name), textStyle: { color: '#64748b' }, top: 0 },
           grid: { left: '3%', right: '4%', bottom: '3%', top: 40, containLabel: true },
           xAxis: {
             type: 'category', data: studentNames,
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' }
           },
           yAxis: {
             type: 'value', max: 100,
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
-            splitLine: { lineStyle: { color: '#1e293b' } }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' },
+            splitLine: { lineStyle: { color: '#e5e7eb' } }
           },
           series
         })
@@ -478,19 +470,19 @@ export default {
         const avgValues = this.dimensions.map(d => Number(this.getDimAvg(d.id).toFixed(1)))
         radar.setOption({
           backgroundColor: 'transparent',
-          tooltip: { backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0' } },
-          legend: { data: [stu.realName, '班级平均'], textStyle: { color: '#94a3b8' }, top: 0 },
+          tooltip: { backgroundColor: '#ffffff', borderColor: '#e5e7eb', textStyle: { color: '#2c3e50' } },
+          legend: { data: [stu.realName, '班级平均'], textStyle: { color: '#64748b' }, top: 0 },
           radar: {
             indicator,
-            axisName: { color: '#94a3b8', fontSize: 12 },
-            splitArea: { areaStyle: { color: ['rgba(245,158,11,0.02)', 'rgba(245,158,11,0.05)'] } },
-            splitLine: { lineStyle: { color: '#334155' } },
-            axisLine: { lineStyle: { color: '#334155' } }
+            axisName: { color: '#64748b', fontSize: 12 },
+            splitArea: { areaStyle: { color: ['rgba(97,191,173,0.02)', 'rgba(97,191,173,0.05)'] } },
+            splitLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLine: { lineStyle: { color: '#e5e7eb' } }
           },
           series: [{
             type: 'radar',
             data: [
-              { value: stuValues, name: stu.realName, lineStyle: { color: '#f59e0b', width: 2 }, areaStyle: { color: 'rgba(245,158,11,0.2)' }, itemStyle: { color: '#f59e0b' } },
+              { value: stuValues, name: stu.realName, lineStyle: { color: '#61BFAD', width: 2 }, areaStyle: { color: 'rgba(97,191,173,0.2)' }, itemStyle: { color: '#61BFAD' } },
               { value: avgValues, name: '班级平均', lineStyle: { color: '#8b5cf6', width: 2, type: 'dashed' }, areaStyle: { color: 'rgba(139,92,246,0.1)' }, itemStyle: { color: '#8b5cf6' } }
             ]
           }]
@@ -505,24 +497,24 @@ export default {
         const avgScores = this.dimensions.map(d => Number(this.getDimAvg(d.id).toFixed(1)))
         vsBar.setOption({
           backgroundColor: 'transparent',
-          tooltip: { trigger: 'axis', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0' } },
-          legend: { data: [stu.realName, '班级平均'], textStyle: { color: '#94a3b8' }, top: 0 },
+          tooltip: { trigger: 'axis', backgroundColor: '#ffffff', borderColor: '#e5e7eb', textStyle: { color: '#2c3e50' } },
+          legend: { data: [stu.realName, '班级平均'], textStyle: { color: '#64748b' }, top: 0 },
           grid: { left: '3%', right: '4%', bottom: '3%', top: 40, containLabel: true },
           xAxis: {
             type: 'category', data: dimNames,
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' }
           },
           yAxis: {
             type: 'value', max: 100,
-            axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
-            splitLine: { lineStyle: { color: '#1e293b' } }
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' },
+            splitLine: { lineStyle: { color: '#e5e7eb' } }
           },
           series: [
             {
               name: stu.realName, type: 'bar', barWidth: '30%', data: stuScores,
-              itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#f59e0b' }, { offset: 1, color: '#d97706' }]), borderRadius: [4, 4, 0, 0] }
+              itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#61BFAD' }, { offset: 1, color: '#4ea899' }]), borderRadius: [4, 4, 0, 0] }
             },
             {
               name: '班级平均', type: 'bar', barWidth: '30%', data: avgScores,
@@ -539,32 +531,26 @@ export default {
 <style scoped>
 .report-page { padding: 0; }
 
-.dark-card {
-  background: #1e293b;
+.light-card {
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #334155;
+  border: 1px solid #e5e7eb;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
   font-size: 16px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #2c3e50;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .filter-section { margin-bottom: 20px; }
-.filter-label { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
-
-.report-page >>> .el-input__inner {
-  background: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-.report-page >>> .el-input__inner:focus { border-color: #f59e0b; }
+.filter-label { font-size: 13px; color: #64748b; margin-bottom: 6px; }
 
 .chart-card { padding: 20px; }
 .chart-box { width: 100%; height: 360px; }
@@ -573,8 +559,8 @@ export default {
 /* Stats */
 .stats-row { margin-bottom: 20px; }
 .mini-stat {
-  background: linear-gradient(135deg, #162032, #1e293b);
-  border: 1px solid #334155;
+  background: linear-gradient(135deg, #f9fafb, #ffffff);
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -582,25 +568,17 @@ export default {
 .mini-stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #f59e0b;
+  color: #61BFAD;
 }
 .mini-stat-label {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
   margin-top: 6px;
 }
 
-/* Table */
-.dark-table { background: transparent !important; }
-.dark-table >>> .el-table__body-wrapper { background: #1e293b; }
-.dark-table >>> .el-table__empty-block { background: #1e293b; color: #64748b; }
-.dark-table >>> .el-table__row:hover > td { background: #263348 !important; }
-.dark-table >>> th.el-table__cell { background: #162032 !important; }
-.dark-table::before { display: none; }
-
-.score-excellent { color: #10b981; font-weight: 600; }
+.score-excellent { color: #61BFAD; font-weight: 600; }
 .score-good { color: #3b82f6; font-weight: 600; }
-.score-pass { color: #f59e0b; font-weight: 600; }
+.score-pass { color: #61BFAD; font-weight: 600; }
 .score-fail { color: #ef4444; font-weight: 600; }
 
 /* Empty */

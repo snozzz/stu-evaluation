@@ -83,6 +83,11 @@
         <div ref="classDimBarChart" class="chart-box-wide"></div>
       </div>
 
+      <div class="light-card chart-card">
+        <div class="card-header"><span>班级历次作业/测验平均分趋势</span></div>
+        <div ref="trendLineChart" class="chart-box-wide"></div>
+      </div>
+
       <!-- Stats Summary Cards -->
       <el-row :gutter="20" class="stats-row">
         <el-col :span="6">
@@ -181,7 +186,7 @@
 
 <script>
 import * as echarts from 'echarts'
-import { getBindings, getClassScores, getDimensions, getCourseList, getClassList, getStudentsByClass, getWeights } from '../../api'
+import { getBindings, getClassScores, getDimensions, getCourseList, getClassList, getStudentsByClass, getWeights, getAssignmentList, getAssignmentSubmissions } from '../../api'
 
 export default {
   name: 'TeacherReport',
@@ -196,7 +201,14 @@ export default {
       selectedClass: null,
       selectedStudent: null,
       scoreData: [],
+      rawScoreRecords: [],
       studentList: [],
+      classStudentIds: [],
+      trendData: {
+        labels: [],
+        homework: [],
+        quiz: []
+      },
       charts: []
     }
   },
@@ -288,7 +300,10 @@ export default {
       this.selectedClass = null
       this.selectedStudent = null
       this.scoreData = []
+      this.rawScoreRecords = []
       this.studentList = []
+      this.classStudentIds = []
+      this.trendData = { labels: [], homework: [], quiz: [] }
       this.disposeCharts()
     },
     async handleClassChange() {
@@ -296,6 +311,7 @@ export default {
       this.disposeCharts()
       if (this.selectedCourse && this.selectedClass) {
         await this.loadScores()
+        await this.loadTrendData()
         this.$nextTick(() => this.renderClassCharts())
       }
     },
@@ -310,6 +326,7 @@ export default {
     async loadScores() {
       const res = await getClassScores({ courseId: this.selectedCourse, classId: this.selectedClass })
       const rawScores = res.data.data || []
+      this.rawScoreRecords = rawScores
       const studentMap = {}
       rawScores.forEach(score => {
         if (!studentMap[score.studentId]) {
@@ -320,13 +337,16 @@ export default {
       try {
         const userRes = await getStudentsByClass(this.selectedClass)
         const users = userRes.data.data || []
+        this.classStudentIds = users.map(u => u.id)
         users.forEach(u => {
           if (studentMap[u.id]) {
             studentMap[u.id].studentNo = u.studentNo || ''
             studentMap[u.id].realName = u.realName || u.username || ''
           }
         })
-      } catch (e) { /* ignore */ }
+      } catch (e) {
+        this.classStudentIds = []
+      }
       this.scoreData = Object.values(studentMap)
       this.studentList = this.scoreData.map(s => ({ studentId: s.studentId, realName: s.realName, studentNo: s.studentNo }))
       // load weights
@@ -334,6 +354,69 @@ export default {
         const wRes = await getWeights(this.selectedCourse)
         this.weights = wRes.data.data || []
       } catch (e) { this.weights = [] }
+    },
+    async loadTrendData() {
+      this.trendData = { labels: [], homework: [], quiz: [] }
+      if (!this.selectedCourse || !this.selectedClass) return
+
+      const studentIds = (this.classStudentIds && this.classStudentIds.length > 0)
+        ? this.classStudentIds
+        : this.studentList.map(s => s.studentId)
+      const studentIdSet = new Set(studentIds)
+
+      let homeworkSeries = []
+      try {
+        const res = await getAssignmentList({ courseId: this.selectedCourse })
+        const allAssignments = res.data.data || []
+        const homeworkAssignments = allAssignments
+          .filter(a => a.type === 'HOMEWORK')
+          .sort((a, b) => new Date(a.dueDate || a.createTime).getTime() - new Date(b.dueDate || b.createTime).getTime())
+        const submissionResList = await Promise.all(
+          homeworkAssignments.map(a => getAssignmentSubmissions({ assignmentId: a.id }))
+        )
+        homeworkSeries = submissionResList.map(r => {
+          const rows = (r.data.data || []).filter(x => studentIdSet.has(x.studentId) && x.score != null)
+          if (rows.length === 0) return null
+          const avg = rows.reduce((sum, x) => sum + Number(x.score), 0) / rows.length
+          return Number(avg.toFixed(1))
+        })
+      } catch (e) {
+        homeworkSeries = []
+      }
+
+      let quizSeries = []
+      try {
+        const quizDim = this.dimensions.find(d => d.name === '测验')
+        if (quizDim) {
+          const quizRows = (this.rawScoreRecords || [])
+            .filter(r => r.dimensionId === quizDim.id && studentIdSet.has(r.studentId) && r.score != null)
+            .sort((a, b) => new Date(a.evalDate || a.createTime).getTime() - new Date(b.evalDate || b.createTime).getTime())
+          const bucket = {}
+          quizRows.forEach(row => {
+            const key = row.evalDate ? String(row.evalDate).slice(0, 10) : 'unknown'
+            if (!bucket[key]) bucket[key] = []
+            bucket[key].push(Number(row.score))
+          })
+          quizSeries = Object.keys(bucket).sort().map(k => {
+            const arr = bucket[k]
+            const avg = arr.reduce((a, b) => a + b, 0) / arr.length
+            return Number(avg.toFixed(1))
+          })
+        }
+      } catch (e) {
+        quizSeries = []
+      }
+
+      const count = Math.max(homeworkSeries.length, quizSeries.length, 1)
+      const labels = []
+      const homework = []
+      const quiz = []
+      for (let i = 0; i < count; i++) {
+        labels.push(`第${i + 1}次`)
+        homework.push(i < homeworkSeries.length ? homeworkSeries[i] : null)
+        quiz.push(i < quizSeries.length ? quizSeries[i] : null)
+      }
+      this.trendData = { labels, homework, quiz }
     },
     getWeightedTotal(student) {
       let total = 0, weightSum = 0
@@ -455,6 +538,56 @@ export default {
             splitLine: { lineStyle: { color: '#e5e7eb' } }
           },
           series
+        })
+      }
+
+      const trend = this.initChart('trendLineChart')
+      if (trend) {
+        trend.setOption({
+          backgroundColor: 'transparent',
+          tooltip: {
+            trigger: 'axis',
+            backgroundColor: '#ffffff',
+            borderColor: '#e5e7eb',
+            textStyle: { color: '#2c3e50' }
+          },
+          legend: {
+            data: ['作业平均分', '测验平均分'],
+            textStyle: { color: '#64748b' },
+            top: 0
+          },
+          grid: { left: '3%', right: '4%', bottom: '3%', top: 40, containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: this.trendData.labels,
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' }
+          },
+          yAxis: {
+            type: 'value',
+            max: 100,
+            axisLine: { lineStyle: { color: '#e5e7eb' } },
+            axisLabel: { color: '#64748b' },
+            splitLine: { lineStyle: { color: '#e5e7eb' } }
+          },
+          series: [
+            {
+              name: '作业平均分',
+              type: 'line',
+              smooth: true,
+              data: this.trendData.homework,
+              itemStyle: { color: '#61BFAD' },
+              lineStyle: { width: 3, color: '#61BFAD' }
+            },
+            {
+              name: '测验平均分',
+              type: 'line',
+              smooth: true,
+              data: this.trendData.quiz,
+              itemStyle: { color: '#8b5cf6' },
+              lineStyle: { width: 3, color: '#8b5cf6' }
+            }
+          ]
         })
       }
     },

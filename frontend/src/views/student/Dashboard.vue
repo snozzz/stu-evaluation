@@ -147,6 +147,13 @@
         </div>
       </el-col>
     </el-row>
+
+    <div class="light-card">
+      <div class="card-header">
+        <span>个人多课程总分对比（柱状图）</span>
+      </div>
+      <div ref="courseTotalChart" class="chart-container"></div>
+    </div>
   </div>
 </template>
 
@@ -171,7 +178,9 @@ export default {
       selectedCourseId: '',
       dimensions: [],
       scores: [],
-      radarChart: null
+      radarChart: null,
+      courseTotalChart: null,
+      courseTotalData: []
     }
   },
   computed: {
@@ -194,12 +203,18 @@ export default {
     if (this.radarChart) {
       this.radarChart.dispose()
     }
+    if (this.courseTotalChart) {
+      this.courseTotalChart.dispose()
+    }
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
     handleResize() {
       if (this.radarChart) {
         this.radarChart.resize()
+      }
+      if (this.courseTotalChart) {
+        this.courseTotalChart.resize()
       }
     },
     async fetchStats() {
@@ -231,6 +246,7 @@ export default {
         }
         if (scoreRes.data.code === 200) {
           const scores = scoreRes.data.data || []
+          this.buildCourseTotalData(scores, allCourses)
           // 提取学生有成绩的courseId
           const courseIdSet = [...new Set(scores.map(s => s.courseId))]
           if (courseIdSet.length > 0) {
@@ -246,9 +262,90 @@ export default {
           this.selectedCourseId = this.courses[0].id
           this.handleCourseChange(this.selectedCourseId)
         }
+        this.$nextTick(() => this.initCourseTotalChart())
       } catch (e) {
         console.error('获取课程列表失败', e)
       }
+    },
+    buildCourseTotalData(scores, allCourses) {
+      const byCourse = {}
+      ;(scores || []).forEach(s => {
+        if (!s.courseId || s.score == null) return
+        if (!byCourse[s.courseId]) byCourse[s.courseId] = []
+        byCourse[s.courseId].push(Number(s.score))
+      })
+      const courseMap = {}
+      ;(allCourses || []).forEach(c => { courseMap[c.id] = c.name || c.courseName || ('课程' + c.id) })
+      this.courseTotalData = Object.keys(byCourse).map(cid => {
+        const arr = byCourse[cid]
+        const avg = arr.reduce((a, b) => a + b, 0) / arr.length
+        return {
+          courseId: Number(cid),
+          courseName: courseMap[cid] || ('课程' + cid),
+          totalScore: Number(avg.toFixed(1))
+        }
+      }).sort((a, b) => b.totalScore - a.totalScore)
+    },
+    initCourseTotalChart() {
+      if (!this.$refs.courseTotalChart) return
+      if (this.courseTotalChart) {
+        this.courseTotalChart.dispose()
+      }
+      this.courseTotalChart = echarts.init(this.$refs.courseTotalChart)
+
+      const names = this.courseTotalData.map(x => x.courseName)
+      const values = this.courseTotalData.map(x => x.totalScore)
+      if (names.length === 0) {
+        this.courseTotalChart.setOption({
+          backgroundColor: 'transparent',
+          title: {
+            text: '暂无多课程成绩数据',
+            left: 'center',
+            top: 'center',
+            textStyle: { color: '#64748b', fontSize: 14 }
+          }
+        })
+        return
+      }
+
+      this.courseTotalChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          backgroundColor: '#ffffff',
+          borderColor: '#e5e7eb',
+          textStyle: { color: '#2c3e50' }
+        },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: names,
+          axisLine: { lineStyle: { color: '#e5e7eb' } },
+          axisLabel: { color: '#64748b', rotate: names.length > 6 ? 20 : 0 }
+        },
+        yAxis: {
+          type: 'value',
+          max: 100,
+          axisLine: { lineStyle: { color: '#e5e7eb' } },
+          axisLabel: { color: '#64748b' },
+          splitLine: { lineStyle: { color: '#e5e7eb' } }
+        },
+        series: [{
+          name: '总分',
+          type: 'bar',
+          data: values,
+          barWidth: '46%',
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#3b82f6' },
+              { offset: 1, color: '#2563eb' }
+            ]),
+            borderRadius: [6, 6, 0, 0]
+          },
+          label: { show: true, position: 'top', color: '#2563eb' }
+        }]
+      })
     },
     async fetchAnnouncements() {
       try {

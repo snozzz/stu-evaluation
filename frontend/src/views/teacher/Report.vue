@@ -341,7 +341,7 @@ export default {
         users.forEach(u => {
           if (studentMap[u.id]) {
             studentMap[u.id].studentNo = u.studentNo || ''
-            studentMap[u.id].realName = u.realName || u.username || ''
+            studentMap[u.id].realName = u.realName || u.nickname || ''
           }
         })
       } catch (e) {

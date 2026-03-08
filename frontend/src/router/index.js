@@ -105,6 +105,12 @@ const routes = [
         name: 'TeacherBindings',
         component: () => import('../views/admin/TeacherBinding.vue'),
         meta: { title: '\u6743\u9650\u5206\u914D', role: 'ADMIN' }
+      },
+      {
+        path: 'profile',
+        name: 'AdminProfile',
+        component: () => import('../views/admin/Profile.vue'),
+        meta: { title: '个人中心', role: 'ADMIN' }
       }
     ]
   },

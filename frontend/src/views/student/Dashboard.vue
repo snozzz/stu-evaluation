@@ -200,7 +200,7 @@ export default {
     },
     studentName() {
       const info = this.$store.state.userInfo || {}
-      return info.realName || info.username || '同学'
+      return info.realName || info.nickname || '同学'
     }
   },
   mounted() {

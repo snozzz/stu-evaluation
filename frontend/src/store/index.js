@@ -71,6 +71,6 @@ export default new Vuex.Store({
     isTeacher: state => state.role === 'TEACHER',
     isStudent: state => state.role === 'STUDENT',
     userRole: state => state.role,
-    userName: state => state.userInfo.name || state.userInfo.username || ''
+    userName: state => state.userInfo.realName || state.userInfo.nickname || state.userInfo.studentNo || ''
   }
 })

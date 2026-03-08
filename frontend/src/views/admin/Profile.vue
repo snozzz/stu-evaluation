@@ -22,7 +22,7 @@
               accept="image/*"
               class="avatar-upload"
             >
-              <el-button type="warning" size="small" icon="el-icon-camera">
+              <el-button type="primary" size="small" icon="el-icon-camera">
                 更换头像
               </el-button>
             </el-upload>
@@ -31,9 +31,9 @@
 
           <!-- User Summary -->
           <div class="user-summary">
-            <div class="summary-name">{{ userForm.realName || userForm.nickname || '教师' }}</div>
+            <div class="summary-name">{{ userForm.realName || userForm.nickname || '管理员' }}</div>
             <div class="summary-role">
-              <el-tag type="warning" size="small" effect="dark">教师</el-tag>
+              <el-tag type="danger" size="small" effect="dark">管理员</el-tag>
             </div>
             <div class="summary-info" v-if="userForm.college">
               <i class="el-icon-office-building"></i> {{ userForm.college }}
@@ -49,11 +49,7 @@
           <div class="card-header">
             <span class="card-title">基本信息</span>
           </div>
-          <el-form
-            ref="profileForm"
-            :model="userForm"
-            label-width="80px"
-          >
+          <el-form ref="profileForm" :model="userForm" label-width="80px">
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="昵称">
@@ -91,7 +87,7 @@
               </el-col>
             </el-row>
             <el-form-item>
-              <el-button type="warning" @click="handleUpdateProfile" :loading="profileLoading">
+              <el-button type="primary" @click="handleUpdateProfile" :loading="profileLoading">
                 保存修改
               </el-button>
             </el-form-item>
@@ -144,7 +140,7 @@
               </el-col>
             </el-row>
             <el-form-item>
-              <el-button type="warning" @click="handleChangePassword" :loading="passwordLoading">
+              <el-button type="primary" @click="handleChangePassword" :loading="passwordLoading">
                 修改密码
               </el-button>
             </el-form-item>
@@ -159,7 +155,7 @@
 import { getUserInfo, updateProfile, changePassword, uploadFile } from '../../api'
 
 export default {
-  name: 'TeacherProfile',
+  name: 'AdminProfile',
   data() {
     const validateConfirm = (rule, value, callback) => {
       if (value !== this.passwordForm.newPassword) {
@@ -172,12 +168,12 @@ export default {
     return {
       userForm: {
         id: null,
-        studentNo: '',
         nickname: '',
         realName: '',
         phone: '',
         email: '',
         college: '',
+        studentNo: '',
         avatar: ''
       },
       profileLoading: false,
@@ -204,7 +200,7 @@ export default {
   },
   computed: {
     avatarText() {
-      const name = this.userForm.realName || this.userForm.nickname || '教'
+      const name = this.userForm.realName || this.userForm.nickname || '管'
       return name.charAt(0)
     }
   },
@@ -218,24 +214,21 @@ export default {
         const user = res.data.data
         this.userForm = {
           id: user.id,
-          studentNo: user.studentNo || '',
           nickname: user.nickname || '',
           realName: user.realName || '',
           phone: user.phone || '',
           email: user.email || '',
           college: user.college || '',
+          studentNo: user.studentNo || '',
           avatar: user.avatar || ''
         }
       } catch (e) {
-        console.error('Load user info error:', e)
         this.$message.error('加载用户信息失败')
       }
     },
     async handleAvatarChange(file) {
-      // Validate file
       const isImage = file.raw.type.startsWith('image/')
       const isLt2M = file.raw.size / 1024 / 1024 < 2
-
       if (!isImage) {
         this.$message.error('只能上传图片格式文件')
         return
@@ -244,7 +237,6 @@ export default {
         this.$message.error('图片大小不能超过 2MB')
         return
       }
-
       try {
         const formData = new FormData()
         formData.append('file', file.raw)
@@ -269,7 +261,6 @@ export default {
         }
         await updateProfile(data)
         this.$message.success('个人信息更新成功')
-        // Update store
         if (this.$store.state.userInfo) {
           this.$store.state.userInfo.realName = this.userForm.realName
           this.$store.state.userInfo.nickname = this.userForm.nickname
@@ -284,7 +275,6 @@ export default {
     handleChangePassword() {
       this.$refs.passwordForm.validate(async (valid) => {
         if (!valid) return
-
         this.passwordLoading = true
         try {
           await changePassword({
@@ -292,13 +282,8 @@ export default {
             newPassword: this.passwordForm.newPassword
           })
           this.$message.success('密码修改成功，请重新登录')
-          this.passwordForm = {
-            oldPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-          }
+          this.passwordForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
           this.$refs.passwordForm.resetFields()
-          // Redirect to login after a short delay
           setTimeout(() => {
             this.$store.dispatch('logout').then(() => {
               this.$router.push('/login')
@@ -323,10 +308,10 @@ export default {
 .light-card {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #ecebfa;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(93, 71, 167, 0.06);
 }
 
 .card-header {
@@ -339,10 +324,9 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #2d2a4a;
 }
 
-/* Avatar Card */
 .avatar-area {
   display: flex;
   flex-direction: column;
@@ -356,8 +340,8 @@ export default {
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #61BFAD;
-  box-shadow: 0 0 20px rgba(97, 191, 173, 0.2);
+  border: 3px solid #7b5ce7;
+  box-shadow: 0 0 20px rgba(123, 92, 231, 0.2);
 }
 
 .avatar-img {
@@ -372,7 +356,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #61BFAD, #4ea899);
+  background: linear-gradient(135deg, #7b5ce7, #6544d7);
   color: #fff;
   font-size: 40px;
   font-weight: 700;
@@ -384,37 +368,35 @@ export default {
 
 .avatar-tip {
   font-size: 12px;
-  color: #d1d5db;
+  color: #999;
   text-align: center;
 }
 
-/* User Summary */
 .user-summary {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #ecebfa;
 }
 
 .summary-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #2d2a4a;
 }
 
 .summary-info {
   font-size: 13px;
-  color: #64748b;
+  color: #7a7598;
 }
 
 .summary-info i {
   margin-right: 4px;
-  color: #d1d5db;
+  color: #b0adc5;
 }
 
-/* Validation Error */
 .profile-page >>> .el-form-item__error {
   color: #ef4444;
 }

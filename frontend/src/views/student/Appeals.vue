@@ -116,7 +116,7 @@
             <el-option
               v-for="teacher in teachers"
               :key="teacher.id"
-              :label="teacher.realName || teacher.name || teacher.username"
+              :label="teacher.realName || teacher.name || teacher.nickname"
               :value="teacher.id"
             ></el-option>
           </el-select>

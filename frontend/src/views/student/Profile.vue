@@ -21,7 +21,7 @@
                 </div>
               </el-upload>
             </div>
-            <h3 class="user-name">{{ profileForm.realName || profileForm.username || '同学' }}</h3>
+            <h3 class="user-name">{{ profileForm.realName || profileForm.nickname || '同学' }}</h3>
             <p class="user-role">学生</p>
           </div>
 
@@ -67,7 +67,7 @@
               <el-col :span="12">
                 <el-form-item label="昵称">
                   <el-input
-                    v-model="profileForm.username"
+                    v-model="profileForm.nickname"
                     placeholder="请输入昵称"
                   ></el-input>
                 </el-form-item>
@@ -86,7 +86,7 @@
                 <el-form-item label="学号">
                   <el-input
                     v-model="profileForm.studentNo"
-                    placeholder="请输入学号"
+                    disabled
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -219,7 +219,7 @@ export default {
     return {
       profileForm: {
         id: '',
-        username: '',
+        nickname: '',
         realName: '',
         studentNo: '',
         className: '',
@@ -257,7 +257,7 @@ export default {
       return this.profileForm.avatar || ''
     },
     avatarText() {
-      const name = this.profileForm.realName || this.profileForm.username || ''
+      const name = this.profileForm.realName || this.profileForm.nickname || ''
       return name ? name.charAt(0) : 'S'
     }
   },
@@ -270,7 +270,7 @@ export default {
       const storeInfo = this.$store.state.userInfo || {}
       this.profileForm = {
         id: storeInfo.id || '',
-        username: storeInfo.username || '',
+        nickname: storeInfo.nickname || '',
         realName: storeInfo.realName || '',
         studentNo: storeInfo.studentNo || storeInfo.studentNumber || '',
         className: storeInfo.className || storeInfo.classname || '',
@@ -288,7 +288,7 @@ export default {
           const data = res.data.data
           this.profileForm = {
             id: data.id,
-            username: data.username || '',
+            nickname: data.nickname || '',
             realName: data.realName || '',
             studentNo: data.studentNo || data.studentNumber || '',
             className: data.className || data.classname || '',

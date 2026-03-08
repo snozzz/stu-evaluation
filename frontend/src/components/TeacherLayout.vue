@@ -125,7 +125,7 @@ export default {
       return this.$store.state.userInfo || {}
     },
     userName() {
-      return this.userInfo.realName || this.userInfo.username || '教师'
+      return this.userInfo.realName || this.userInfo.nickname || '教师'
     },
     avatarText() {
       const name = this.userName

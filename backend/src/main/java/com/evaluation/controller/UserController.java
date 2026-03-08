@@ -68,7 +68,7 @@ public class UserController {
         }
         if (StringUtils.hasText(keyword)) {
             wrapper.and(w -> w.like(SysUser::getRealName, keyword)
-                    .or().like(SysUser::getUsername, keyword));
+                    .or().like(SysUser::getStudentNo, keyword));
         }
         wrapper.orderByAsc(SysUser::getId);
         Page<SysUser> result = sysUserService.page(pageParam, wrapper);

@@ -105,7 +105,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public Map<String, Object> login(LoginDTO dto) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", dto.getUsername());
+        queryWrapper.eq("student_no", dto.getUsername());
         SysUser user = sysUserMapper.selectOne(queryWrapper);
 
         if (user == null) {
@@ -152,6 +152,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public void register(SysUser user) {
+        // 学号唯一性校验
+        if (user.getStudentNo() != null && !user.getStudentNo().isEmpty()) {
+            QueryWrapper<SysUser> checkWrapper = new QueryWrapper<>();
+            checkWrapper.eq("student_no", user.getStudentNo());
+            if (user.getId() != null) {
+                checkWrapper.ne("id", user.getId());
+            }
+            SysUser existing = sysUserMapper.selectOne(checkWrapper);
+            if (existing != null) {
+                throw new RuntimeException("该学号已存在");
+            }
+        } else {
+            throw new RuntimeException("学号不能为空");
+        }
+        // 用户名自动设置为学号
+        user.setUsername(user.getStudentNo());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());

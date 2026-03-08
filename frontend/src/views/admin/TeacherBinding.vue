@@ -19,7 +19,7 @@
           <el-option
             v-for="t in teacherList"
             :key="t.id"
-            :label="t.realName || t.username"
+            :label="t.realName || t.nickname"
             :value="t.id"
           ></el-option>
         </el-select>

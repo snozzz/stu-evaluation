@@ -37,7 +37,7 @@
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
-            placeholder="请输入用户名"
+            placeholder="请输入学号"
             prefix-icon="el-icon-user"
           />
         </el-form-item>
@@ -81,7 +81,7 @@ export default {
           { required: true, message: '请选择身份', trigger: 'change' }
         ],
         username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          { required: true, message: '请输入学号', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
@@ -116,7 +116,7 @@ export default {
           this.$router.push(target)
           this.$message.success('登录成功')
         }).catch(err => {
-          this.$message.error(err.message || '登录失败，请检查用户名和密码')
+          this.$message.error(err.message || '登录失败，请检查学号和密码')
         }).finally(() => {
           this.loading = false
         })

@@ -117,7 +117,7 @@ export default {
       return this.$store.state.userInfo || {}
     },
     userName() {
-      return this.userInfo.realName || this.userInfo.username || '同学'
+      return this.userInfo.realName || this.userInfo.nickname || '同学'
     },
     avatarText() {
       const name = this.userName

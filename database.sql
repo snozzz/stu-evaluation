@@ -55,12 +55,12 @@ CREATE TABLE sys_user (
   college VARCHAR(100) DEFAULT NULL,
   major VARCHAR(100) DEFAULT NULL,
   class_name VARCHAR(100) DEFAULT NULL,
-  student_no VARCHAR(50) DEFAULT NULL,
+  student_no VARCHAR(50) NOT NULL,
   status TINYINT(1) DEFAULT 1,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY username (username)
+  UNIQUE KEY student_no (student_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================

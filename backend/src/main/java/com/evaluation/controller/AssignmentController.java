@@ -5,6 +5,7 @@ import com.evaluation.entity.Assignment;
 import com.evaluation.entity.AssignmentSubmission;
 import com.evaluation.service.AssignmentService;
 import com.evaluation.service.AssignmentSubmissionService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,9 @@ public class AssignmentController {
 
     @Resource
     private AssignmentSubmissionService assignmentSubmissionService;
+
+    @Resource
+    private IdResetUtil idResetUtil;
 
     @PostMapping("/create")
     public Result<?> create(@RequestBody Assignment assignment) {
@@ -44,7 +48,11 @@ public class AssignmentController {
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
         boolean removed = assignmentService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("assignment");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 
     @PostMapping("/submit")

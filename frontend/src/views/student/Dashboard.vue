@@ -111,6 +111,7 @@
               v-for="item in announcements"
               :key="'ann-' + item.id"
               class="announcement-item"
+              @click="showAnnouncement(item)"
             >
               <div class="announcement-dot"></div>
               <div class="announcement-content">
@@ -154,6 +155,14 @@
       </div>
       <div ref="courseTotalChart" class="chart-container"></div>
     </div>
+
+    <el-dialog :title="currentAnnouncement.title" :visible.sync="announcementVisible" width="600px" append-to-body>
+      <div class="announcement-detail-time">{{ currentAnnouncement.createTime }}</div>
+      <div class="announcement-detail-content">{{ currentAnnouncement.content || '暂无内容' }}</div>
+      <span slot="footer">
+        <el-button @click="announcementVisible = false">关闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -180,7 +189,9 @@ export default {
       scores: [],
       radarChart: null,
       courseTotalChart: null,
-      courseTotalData: []
+      courseTotalData: [],
+      announcementVisible: false,
+      currentAnnouncement: {}
     }
   },
   computed: {
@@ -346,6 +357,10 @@ export default {
           label: { show: true, position: 'top', color: '#2563eb' }
         }]
       })
+    },
+    showAnnouncement(item) {
+      this.currentAnnouncement = item
+      this.announcementVisible = true
     },
     async fetchAnnouncements() {
       try {
@@ -668,6 +683,7 @@ export default {
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
+  cursor: pointer;
 }
 
 .announcement-item:last-child {
@@ -793,5 +809,18 @@ export default {
   color: #fff;
   font-size: 16px;
   font-weight: 500;
+}
+
+.announcement-detail-time {
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.announcement-detail-content {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
 }
 </style>

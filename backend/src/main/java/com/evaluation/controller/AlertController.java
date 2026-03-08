@@ -19,8 +19,8 @@ import com.evaluation.service.SelfEvaluationService;
 import com.evaluation.service.CourseService;
 import com.evaluation.service.StudentClassService;
 import com.evaluation.service.TeacherCourseClassService;
-import com.evaluation.util.Result;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.evaluation.util.IdResetUtil;
+import com.evaluation.util.Result;import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -60,6 +60,9 @@ public class AlertController {
     @Resource
     private TeacherCourseClassService teacherCourseClassService;
 
+    @Resource
+    private IdResetUtil idResetUtil;
+
     @GetMapping("/rules")
     public Result<?> listRules() {
         List<AlertRule> list = alertRuleService.list();
@@ -82,7 +85,11 @@ public class AlertController {
     @DeleteMapping("/rule/{id}")
     public Result<?> deleteRule(@PathVariable Long id) {
         boolean removed = alertRuleService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("alert_rule");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 
     @GetMapping("/records")

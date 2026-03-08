@@ -8,6 +8,7 @@ import com.evaluation.entity.SysUser;
 import com.evaluation.service.ClassInfoService;
 import com.evaluation.service.StudentClassService;
 import com.evaluation.service.SysUserService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,9 @@ public class ClassController {
     @Resource
     private SysUserService sysUserService;
 
+    @Resource
+    private IdResetUtil idResetUtil;
+
     @GetMapping("/list")
     public Result<?> list(@RequestParam(defaultValue = "1") Integer page,
                           @RequestParam(defaultValue = "10") Integer size,
@@ -39,7 +43,7 @@ public class ClassController {
         if (StringUtils.hasText(keyword)) {
             wrapper.like(ClassInfo::getName, keyword);
         }
-        wrapper.orderByDesc(ClassInfo::getCreateTime);
+        wrapper.orderByAsc(ClassInfo::getId);
         Page<ClassInfo> result = classInfoService.page(pageParam, wrapper);
         return Result.success(result);
     }
@@ -60,7 +64,11 @@ public class ClassController {
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
         boolean removed = classInfoService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("class_info");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 
     @GetMapping("/{id}")

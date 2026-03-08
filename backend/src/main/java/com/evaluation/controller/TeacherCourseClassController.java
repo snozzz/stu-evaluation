@@ -2,6 +2,7 @@ package com.evaluation.controller;
 
 import com.evaluation.entity.TeacherCourseClass;
 import com.evaluation.service.TeacherCourseClassService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,9 @@ public class TeacherCourseClassController {
 
     @Resource
     private TeacherCourseClassService teacherCourseClassService;
+
+    @Resource
+    private IdResetUtil idResetUtil;
 
     @GetMapping("/list")
     public Result<?> list(@RequestParam(required = false) Long teacherId) {
@@ -34,6 +38,10 @@ public class TeacherCourseClassController {
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
         boolean removed = teacherCourseClassService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("teacher_course_class");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 }

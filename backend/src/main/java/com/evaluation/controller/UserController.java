@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.evaluation.entity.SysUser;
 import com.evaluation.service.SysUserService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -18,6 +19,9 @@ public class UserController {
 
     @Resource
     private SysUserService sysUserService;
+
+    @Resource
+    private IdResetUtil idResetUtil;
 
     @GetMapping("/info")
     public Result<?> info() {
@@ -66,7 +70,7 @@ public class UserController {
             wrapper.and(w -> w.like(SysUser::getRealName, keyword)
                     .or().like(SysUser::getUsername, keyword));
         }
-        wrapper.orderByDesc(SysUser::getCreateTime);
+        wrapper.orderByAsc(SysUser::getId);
         Page<SysUser> result = sysUserService.page(pageParam, wrapper);
         return Result.success(result);
     }
@@ -83,8 +87,16 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
-        boolean removed = sysUserService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        try {
+            boolean removed = sysUserService.removeById(id);
+            if (removed) {
+                idResetUtil.resetAutoIncrement("sys_user");
+                return Result.success();
+            }
+            return Result.error("删除失败");
+        } catch (Exception e) {
+            return Result.error("删除失败：" + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

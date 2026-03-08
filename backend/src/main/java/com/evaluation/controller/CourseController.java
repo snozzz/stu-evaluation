@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.evaluation.entity.Course;
 import com.evaluation.service.CourseService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ public class CourseController {
     @Resource
     private CourseService courseService;
 
+    @Resource
+    private IdResetUtil idResetUtil;
+
     @GetMapping("/list")
     public Result<?> list(@RequestParam(defaultValue = "1") Integer page,
                           @RequestParam(defaultValue = "10") Integer size,
@@ -27,7 +31,7 @@ public class CourseController {
             wrapper.like(Course::getName, keyword)
                     .or().like(Course::getCode, keyword);
         }
-        wrapper.orderByDesc(Course::getCreateTime);
+        wrapper.orderByAsc(Course::getId);
         Page<Course> result = courseService.page(pageParam, wrapper);
         return Result.success(result);
     }
@@ -48,7 +52,11 @@ public class CourseController {
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
         boolean removed = courseService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("course");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 
     @GetMapping("/{id}")

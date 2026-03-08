@@ -3,39 +3,27 @@
     <div class="dashboard-container">
       <el-row :gutter="20" class="stat-row">
         <el-col :span="6">
-          <div class="stat-card" style="background: linear-gradient(135deg, #7b5ce7, #6544d7);">
-            <div class="stat-icon"><i class="el-icon-reading"></i></div>
-            <div class="stat-info">
-              <div class="stat-number">{{ stats.totalCourses || 0 }}</div>
-              <div class="stat-label">全校课程数</div>
-            </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-number">{{ stats.totalCourses || 0 }}</div>
+            <div class="stat-label">全校课程数</div>
           </div>
         </el-col>
         <el-col :span="6">
-          <div class="stat-card" style="background: linear-gradient(135deg, #5e8bff, #4a73f0);">
-            <div class="stat-icon"><i class="el-icon-data-line"></i></div>
-            <div class="stat-info">
-              <div class="stat-number">{{ stats.evaluatedClassCount || 0 }}</div>
-              <div class="stat-label">已评价班级数</div>
-            </div>
+          <div class="stat-card stat-blue">
+            <div class="stat-number">{{ stats.evaluatedClassCount || 0 }}</div>
+            <div class="stat-label">已评价班级数</div>
           </div>
         </el-col>
         <el-col :span="6">
-          <div class="stat-card" style="background: linear-gradient(135deg, #ec5db7, #d94aa2);">
-            <div class="stat-icon"><i class="el-icon-time"></i></div>
-            <div class="stat-info">
-              <div class="stat-number">{{ stats.pendingClassCount || 0 }}</div>
-              <div class="stat-label">待评价班级数</div>
-            </div>
+          <div class="stat-card stat-pink">
+            <div class="stat-number">{{ stats.pendingClassCount || 0 }}</div>
+            <div class="stat-label">待评价班级数</div>
           </div>
         </el-col>
         <el-col :span="6">
-          <div class="stat-card" style="background: linear-gradient(135deg, #fb7b90, #ef5e77);">
-            <div class="stat-icon"><i class="el-icon-warning-outline"></i></div>
-            <div class="stat-info">
-              <div class="stat-number">{{ stats.alertCount || 0 }}</div>
-              <div class="stat-label">异常预警数</div>
-            </div>
+          <div class="stat-card stat-red">
+            <div class="stat-number">{{ stats.alertCount || 0 }}</div>
+            <div class="stat-label">异常预警数</div>
           </div>
         </el-col>
       </el-row>
@@ -60,7 +48,7 @@
           <div class="light-card announcement-card">
             <div class="card-header"><span>最新公告</span></div>
             <div class="announcement-list">
-              <div v-for="item in announcements" :key="item.id" class="announcement-item">
+              <div v-for="item in announcements" :key="item.id" class="announcement-item" @click="showAnnouncement(item)">
                 <div class="announcement-title">
                   <el-tag v-if="item.isTop === 1" size="mini" type="danger" effect="dark" style="margin-right: 8px;">置顶</el-tag>
                   {{ item.title }}
@@ -97,6 +85,15 @@
         </el-col>
       </el-row>
     </div>
+
+    <el-dialog :title="currentAnnouncement.title" :visible.sync="announcementVisible" width="600px" append-to-body>
+      <div class="announcement-detail-time">{{ currentAnnouncement.createTime }}</div>
+      <div class="announcement-detail-content">{{ currentAnnouncement.content || '暂无内容' }}</div>
+      <span slot="footer">
+        <el-button @click="announcementVisible = false">关闭</el-button>
+        <el-button type="primary" @click="goAnnouncements">前往公告管理</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -122,7 +119,9 @@ export default {
       announcements: [],
       carousels: [],
       courseChart: null,
-      pieChart: null
+      pieChart: null,
+      announcementVisible: false,
+      currentAnnouncement: {}
     }
   },
   mounted() {
@@ -148,6 +147,14 @@ export default {
         this.pieChart.dispose()
         this.pieChart = null
       }
+    },
+    showAnnouncement(item) {
+      this.currentAnnouncement = item
+      this.announcementVisible = true
+    },
+    goAnnouncements() {
+      this.announcementVisible = false
+      this.$router.push('/admin/announcements')
     },
     async fetchStats() {
       try {
@@ -303,11 +310,11 @@ export default {
 .stat-card {
   border-radius: 14px;
   padding: 24px;
-  display: flex;
-  align-items: center;
-  color: #fff;
   min-height: 104px;
-  box-shadow: 0 8px 20px rgba(60, 37, 121, 0.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: transform 0.25s ease;
 }
 
@@ -315,15 +322,29 @@ export default {
   transform: translateY(-3px);
 }
 
-.stat-icon {
-  font-size: 34px;
-  margin-right: 16px;
-  opacity: 0.9;
+.stat-purple {
+  background: #f3effe;
 }
+.stat-purple .stat-number { color: #6544d7; }
+.stat-purple .stat-label { color: #8672c4; }
 
-.stat-info {
-  flex: 1;
+.stat-blue {
+  background: #eef3ff;
 }
+.stat-blue .stat-number { color: #4a73f0; }
+.stat-blue .stat-label { color: #7291d6; }
+
+.stat-pink {
+  background: #fdeef8;
+}
+.stat-pink .stat-number { color: #d94aa2; }
+.stat-pink .stat-label { color: #c07aab; }
+
+.stat-red {
+  background: #fef0f1;
+}
+.stat-red .stat-number { color: #ef5e77; }
+.stat-red .stat-label { color: #d08a94; }
 
 .stat-number {
   font-size: 30px;
@@ -333,7 +354,6 @@ export default {
 
 .stat-label {
   font-size: 13px;
-  opacity: 0.9;
   margin-top: 4px;
 }
 
@@ -376,6 +396,7 @@ export default {
   padding: 14px 0;
   border-bottom: 1px solid #efedf9;
   transition: background 0.2s;
+  cursor: pointer;
 }
 
 .announcement-item:last-child {
@@ -439,5 +460,18 @@ export default {
 
 .meta-value.danger {
   color: #d33d6a;
+}
+
+.announcement-detail-time {
+  color: #7a7598;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.announcement-detail-content {
+  color: #2d2a4a;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
 }
 </style>

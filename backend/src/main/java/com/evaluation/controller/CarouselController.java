@@ -3,6 +3,7 @@ package com.evaluation.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.evaluation.entity.Carousel;
 import com.evaluation.service.CarouselService;
+import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,9 @@ public class CarouselController {
 
     @Resource
     private CarouselService carouselService;
+
+    @Resource
+    private IdResetUtil idResetUtil;
 
     @GetMapping("/list")
     public Result<?> list() {
@@ -40,6 +44,10 @@ public class CarouselController {
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
         boolean removed = carouselService.removeById(id);
-        return removed ? Result.success() : Result.error("删除失败");
+        if (removed) {
+            idResetUtil.resetAutoIncrement("carousel");
+            return Result.success();
+        }
+        return Result.error("删除失败");
     }
 }

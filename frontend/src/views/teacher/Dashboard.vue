@@ -15,47 +15,27 @@
     <!-- Top Stats Row -->
     <el-row :gutter="20" class="stats-row">
       <el-col :span="6">
-        <div class="stat-card amber-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-notebook-2"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ stats.courseCount }}</div>
-            <div class="stat-label">我的课程数</div>
-          </div>
+        <div class="stat-card stat-teal">
+          <div class="stat-value">{{ stats.courseCount }}</div>
+          <div class="stat-label">我的课程数</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card green-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-office-building"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ stats.classCount }}</div>
-            <div class="stat-label">我的班级数</div>
-          </div>
+        <div class="stat-card stat-green">
+          <div class="stat-value">{{ stats.classCount }}</div>
+          <div class="stat-label">我的班级数</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card purple-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-finished"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ stats.evaluatedCount }}</div>
-            <div class="stat-label">已评价学生</div>
-          </div>
+        <div class="stat-card stat-purple">
+          <div class="stat-value">{{ stats.evaluatedCount }}</div>
+          <div class="stat-label">已评价学生</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card red-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-chat-line-round"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ stats.pendingFeedback }}</div>
-            <div class="stat-label">待处理反馈</div>
-          </div>
+        <div class="stat-card stat-red">
+          <div class="stat-value">{{ stats.pendingFeedback }}</div>
+          <div class="stat-label">待处理反馈</div>
         </div>
       </el-col>
     </el-row>
@@ -286,11 +266,12 @@ export default {
 .stat-card {
   border-radius: 12px;
   padding: 24px 20px;
+  min-height: 100px;
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: default;
 }
 
 .stat-card:hover {
@@ -298,49 +279,38 @@ export default {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-.amber-gradient {
-  background: linear-gradient(135deg, #61BFAD, #4ea899);
+.stat-teal {
+  background: #eef9f6;
 }
+.stat-teal .stat-value { color: #3a9e8e; }
+.stat-teal .stat-label { color: #6ab5a8; }
 
-.green-gradient {
-  background: linear-gradient(135deg, #61BFAD, #4ea899);
+.stat-green {
+  background: #eef9f6;
 }
+.stat-green .stat-value { color: #2d8a7a; }
+.stat-green .stat-label { color: #5daa9d; }
 
-.purple-gradient {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+.stat-purple {
+  background: #f3effe;
 }
+.stat-purple .stat-value { color: #7c3aed; }
+.stat-purple .stat-label { color: #9a7ad4; }
 
-.red-gradient {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+.stat-red {
+  background: #fef0f0;
 }
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.stat-info {
-  flex: 1;
-}
+.stat-red .stat-value { color: #dc2626; }
+.stat-red .stat-label { color: #d07070; }
 
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #fff;
   line-height: 1.2;
 }
 
 .stat-label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
   margin-top: 4px;
 }
 

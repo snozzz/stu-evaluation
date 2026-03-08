@@ -26,47 +26,27 @@
     <!-- Stat Cards -->
     <el-row :gutter="20" class="stat-row">
       <el-col :span="6">
-        <div class="stat-card pink-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-reading"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.courseCount || 0 }}</div>
-            <div class="stat-label">我的课程</div>
-          </div>
+        <div class="stat-card stat-teal">
+          <div class="stat-number">{{ stats.courseCount || 0 }}</div>
+          <div class="stat-label">我的课程</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card green-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-data-analysis"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.avgScore || '--' }}</div>
-            <div class="stat-label">平均分</div>
-          </div>
+        <div class="stat-card stat-blue">
+          <div class="stat-number">{{ stats.avgScore || '--' }}</div>
+          <div class="stat-label">平均分</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card amber-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-edit-outline"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-number">{{ stats.pendingSelfEval || 0 }}</div>
-            <div class="stat-label">待完成自评</div>
-          </div>
+        <div class="stat-card stat-amber">
+          <div class="stat-number">{{ stats.pendingSelfEval || 0 }}</div>
+          <div class="stat-label">待完成自评</div>
         </div>
       </el-col>
       <el-col :span="6">
-        <div class="stat-card red-gradient">
-          <div class="stat-icon">
-            <i class="el-icon-warning-outline"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-number">{{ alertCount }}</div>
-            <div class="stat-label">异常提醒</div>
-          </div>
+        <div class="stat-card stat-red">
+          <div class="stat-number">{{ alertCount }}</div>
+          <div class="stat-label">异常提醒</div>
         </div>
       </el-col>
     </el-row>
@@ -583,11 +563,11 @@ export default {
 .stat-card {
   border-radius: 12px;
   padding: 24px;
-  display: flex;
-  align-items: center;
-  color: #fff;
   min-height: 100px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease;
 }
 
@@ -595,31 +575,29 @@ export default {
   transform: translateY(-4px);
 }
 
-.pink-gradient {
-  background: linear-gradient(135deg, #61BFAD, #4da89a);
+.stat-teal {
+  background: #eef9f6;
 }
+.stat-teal .stat-number { color: #3a9e8e; }
+.stat-teal .stat-label { color: #6ab5a8; }
 
-.green-gradient {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+.stat-blue {
+  background: #eef3ff;
 }
+.stat-blue .stat-number { color: #2563eb; }
+.stat-blue .stat-label { color: #6b8fd9; }
 
-.amber-gradient {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+.stat-amber {
+  background: #fef7ea;
 }
+.stat-amber .stat-number { color: #d97706; }
+.stat-amber .stat-label { color: #c9a04e; }
 
-.red-gradient {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+.stat-red {
+  background: #fef0f0;
 }
-
-.stat-icon {
-  font-size: 40px;
-  margin-right: 20px;
-  opacity: 0.9;
-}
-
-.stat-info {
-  flex: 1;
-}
+.stat-red .stat-number { color: #dc2626; }
+.stat-red .stat-label { color: #d07070; }
 
 .stat-number {
   font-size: 32px;
@@ -629,7 +607,6 @@ export default {
 
 .stat-label {
   font-size: 14px;
-  opacity: 0.85;
   margin-top: 4px;
 }
 

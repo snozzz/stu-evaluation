@@ -37,7 +37,7 @@
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
-            placeholder="请输入学号"
+            :placeholder="loginPlaceholder"
             prefix-icon="el-icon-user"
           />
         </el-form-item>
@@ -81,15 +81,25 @@ export default {
           { required: true, message: '请选择身份', trigger: 'change' }
         ],
         username: [
-          { required: true, message: '请输入学号', trigger: 'blur' }
+          { required: true, message: '请输入学号/工号', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
         ]
       },
       loading: false,
+      placeholderMap: {
+        ADMIN: '请输入工号',
+        TEACHER: '请输入工号',
+        STUDENT: '请输入学号'
+      },
       particles: [],
       animationId: null
+    }
+  },
+  computed: {
+    loginPlaceholder() {
+      return this.placeholderMap[this.form.role] || '请输入学号/工号'
     }
   },
   mounted() {
@@ -116,7 +126,7 @@ export default {
           this.$router.push(target)
           this.$message.success('登录成功')
         }).catch(err => {
-          this.$message.error(err.message || '登录失败，请检查学号和密码')
+          this.$message.error(err.message || '登录失败，请检查账号和密码')
         }).finally(() => {
           this.loading = false
         })

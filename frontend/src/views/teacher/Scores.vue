@@ -516,7 +516,7 @@ export default {
             this.loadScores()
           }
         } else {
-          this.$message.error(res.data.msg || '导入失败')
+          this.$message.error(res.data.message || res.data.msg || '导入失败')
         }
       } catch (e) {
         this.$message.error('导入失败')

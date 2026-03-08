@@ -81,7 +81,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="学号">
+                <el-form-item label="工号">
                   <el-input v-model="userForm.studentNo" disabled></el-input>
                 </el-form-item>
               </el-col>

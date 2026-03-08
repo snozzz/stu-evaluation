@@ -5,7 +5,7 @@
       <div class="search-bar">
         <el-input
           v-model="keyword"
-          placeholder="搜索学号/姓名"
+          placeholder="搜索学号/工号/姓名"
           clearable
           style="width: 220px; margin-right: 12px;"
           @keyup.enter.native="handleSearch"
@@ -40,7 +40,7 @@
             <el-avatar :size="36" :src="scope.row.avatar" icon="el-icon-user-solid"></el-avatar>
           </template>
         </el-table-column>
-        <el-table-column prop="studentNo" label="学号" width="130"></el-table-column>
+        <el-table-column prop="studentNo" label="学号/工号" width="130"></el-table-column>
         <el-table-column prop="realName" label="姓名" width="120"></el-table-column>
         <el-table-column prop="role" label="角色" width="100">
           <template slot-scope="scope">
@@ -87,8 +87,8 @@
       :close-on-click-modal="false"
     >
       <el-form :model="form" :rules="rules" ref="userForm" label-width="80px">
-        <el-form-item label="学号" prop="studentNo">
-          <el-input v-model="form.studentNo" placeholder="请输入学号" :disabled="dialogType === 'edit'"></el-input>
+        <el-form-item :label="form.role === 'STUDENT' ? '学号' : '工号'" prop="studentNo">
+          <el-input v-model="form.studentNo" :placeholder="form.role === 'STUDENT' ? '请输入学号' : '请输入工号'" :disabled="dialogType === 'edit'"></el-input>
         </el-form-item>
         <el-form-item v-if="dialogType === 'add'" label="密码" prop="password">
           <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password></el-input>
@@ -156,7 +156,7 @@ export default {
         email: ''
       },
       rules: {
-        studentNo: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+        studentNo: [{ required: true, message: '请输入学号/工号', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         realName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         role: [{ required: true, message: '请选择角色', trigger: 'change' }]

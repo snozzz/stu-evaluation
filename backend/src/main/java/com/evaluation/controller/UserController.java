@@ -2,7 +2,11 @@ package com.evaluation.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.evaluation.entity.ClassInfo;
+import com.evaluation.entity.StudentClass;
 import com.evaluation.entity.SysUser;
+import com.evaluation.service.ClassInfoService;
+import com.evaluation.service.StudentClassService;
 import com.evaluation.service.SysUserService;
 import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
@@ -22,6 +26,12 @@ public class UserController {
 
     @Resource
     private IdResetUtil idResetUtil;
+
+    @Resource
+    private ClassInfoService classInfoService;
+
+    @Resource
+    private StudentClassService studentClassService;
 
     @GetMapping("/info")
     public Result<?> info() {
@@ -79,6 +89,7 @@ public class UserController {
     public Result<?> add(@RequestBody SysUser user) {
         try {
             sysUserService.register(user);
+            syncStudentClass(user);
             return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -103,6 +114,40 @@ public class UserController {
     public Result<?> update(@PathVariable Long id, @RequestBody SysUser user) {
         user.setId(id);
         boolean updated = sysUserService.updateById(user);
+        if (updated) {
+            // Re-read to get full user info (role, className)
+            SysUser fullUser = sysUserService.getById(id);
+            if (fullUser != null) {
+                syncStudentClass(fullUser);
+            }
+        }
         return updated ? Result.success() : Result.error("更新失败");
+    }
+
+    /**
+     * Sync student_class relationship based on user's className field.
+     * When a STUDENT user has a className, find matching ClassInfo and create/update the link.
+     */
+    private void syncStudentClass(SysUser user) {
+        if (user == null || user.getId() == null) return;
+        if (!"STUDENT".equals(user.getRole())) return;
+
+        // Remove old student_class records for this student
+        LambdaQueryWrapper<StudentClass> removeWrapper = new LambdaQueryWrapper<>();
+        removeWrapper.eq(StudentClass::getStudentId, user.getId());
+        studentClassService.remove(removeWrapper);
+
+        // If className is set, find matching class and create link
+        if (StringUtils.hasText(user.getClassName())) {
+            LambdaQueryWrapper<ClassInfo> classWrapper = new LambdaQueryWrapper<>();
+            classWrapper.eq(ClassInfo::getName, user.getClassName().trim());
+            ClassInfo classInfo = classInfoService.getOne(classWrapper);
+            if (classInfo != null) {
+                StudentClass sc = new StudentClass();
+                sc.setStudentId(user.getId());
+                sc.setClassId(classInfo.getId());
+                studentClassService.save(sc);
+            }
+        }
     }
 }

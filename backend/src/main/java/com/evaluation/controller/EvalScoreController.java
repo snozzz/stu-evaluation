@@ -74,6 +74,10 @@ public class EvalScoreController {
                     .sheet()
                     .doReadSync();
 
+            if (dataList == null || dataList.isEmpty()) {
+                return Result.error("Excel文件为空，请检查文件内容");
+            }
+
             // Get all dimensions
             List<EvalDimension> dimensions = evalDimensionService.list();
             Map<String, Long> dimensionMap = new HashMap<>();
@@ -81,73 +85,72 @@ public class EvalScoreController {
                 dimensionMap.put(dim.getName(), dim.getId());
             }
 
-            List<EvalScore> scoreList = new ArrayList<>();
+            int importCount = 0;
+            int updateCount = 0;
+            List<String> skippedStudents = new ArrayList<>();
+
             for (ScoreImportDTO dto : dataList) {
+                if (dto.getStudentNo() == null || dto.getStudentNo().trim().isEmpty()) {
+                    continue;
+                }
                 // Find student by studentNo
                 LambdaQueryWrapper<SysUser> userWrapper = new LambdaQueryWrapper<>();
-                userWrapper.eq(SysUser::getStudentNo, dto.getStudentNo());
+                userWrapper.eq(SysUser::getStudentNo, dto.getStudentNo().trim());
                 SysUser student = sysUserService.getOne(userWrapper);
                 if (student == null) {
+                    skippedStudents.add(dto.getStudentNo());
                     continue;
                 }
 
-                // Create score records for each dimension
-                if (dto.getAttendance() != null && dimensionMap.containsKey("考勤")) {
-                    EvalScore score = new EvalScore();
-                    score.setStudentId(student.getId());
-                    score.setCourseId(courseId);
-                    score.setTeacherId(teacherId);
-                    score.setDimensionId(dimensionMap.get("考勤"));
-                    score.setScore(BigDecimal.valueOf(dto.getAttendance()));
-                    score.setEvalDate(new Date());
-                    scoreList.add(score);
-                }
-                if (dto.getHomework() != null && dimensionMap.containsKey("作业")) {
-                    EvalScore score = new EvalScore();
-                    score.setStudentId(student.getId());
-                    score.setCourseId(courseId);
-                    score.setTeacherId(teacherId);
-                    score.setDimensionId(dimensionMap.get("作业"));
-                    score.setScore(BigDecimal.valueOf(dto.getHomework()));
-                    score.setEvalDate(new Date());
-                    scoreList.add(score);
-                }
-                if (dto.getExperiment() != null && dimensionMap.containsKey("实验")) {
-                    EvalScore score = new EvalScore();
-                    score.setStudentId(student.getId());
-                    score.setCourseId(courseId);
-                    score.setTeacherId(teacherId);
-                    score.setDimensionId(dimensionMap.get("实验"));
-                    score.setScore(BigDecimal.valueOf(dto.getExperiment()));
-                    score.setEvalDate(new Date());
-                    scoreList.add(score);
-                }
-                if (dto.getQuiz() != null && dimensionMap.containsKey("测验")) {
-                    EvalScore score = new EvalScore();
-                    score.setStudentId(student.getId());
-                    score.setCourseId(courseId);
-                    score.setTeacherId(teacherId);
-                    score.setDimensionId(dimensionMap.get("测验"));
-                    score.setScore(BigDecimal.valueOf(dto.getQuiz()));
-                    score.setEvalDate(new Date());
-                    scoreList.add(score);
-                }
-                if (dto.getParticipation() != null && dimensionMap.containsKey("课堂参与")) {
-                    EvalScore score = new EvalScore();
-                    score.setStudentId(student.getId());
-                    score.setCourseId(courseId);
-                    score.setTeacherId(teacherId);
-                    score.setDimensionId(dimensionMap.get("课堂参与"));
-                    score.setScore(BigDecimal.valueOf(dto.getParticipation()));
-                    score.setEvalDate(new Date());
-                    scoreList.add(score);
+                // Map dimension name -> score value
+                Map<String, Double> dimScores = new LinkedHashMap<>();
+                dimScores.put("考勤", dto.getAttendance());
+                dimScores.put("作业", dto.getHomework());
+                dimScores.put("实验", dto.getExperiment());
+                dimScores.put("测验", dto.getQuiz());
+                dimScores.put("课堂参与", dto.getParticipation());
+
+                for (Map.Entry<String, Double> entry : dimScores.entrySet()) {
+                    if (entry.getValue() == null || !dimensionMap.containsKey(entry.getKey())) {
+                        continue;
+                    }
+                    Long dimensionId = dimensionMap.get(entry.getKey());
+
+                    // Check if score already exists (avoid duplicates)
+                    LambdaQueryWrapper<EvalScore> existWrapper = new LambdaQueryWrapper<>();
+                    existWrapper.eq(EvalScore::getStudentId, student.getId())
+                            .eq(EvalScore::getCourseId, courseId)
+                            .eq(EvalScore::getDimensionId, dimensionId);
+                    EvalScore existing = evalScoreService.getOne(existWrapper);
+
+                    if (existing != null) {
+                        // Update existing score
+                        existing.setScore(BigDecimal.valueOf(entry.getValue()));
+                        existing.setTeacherId(teacherId);
+                        existing.setEvalDate(new Date());
+                        evalScoreService.updateById(existing);
+                        updateCount++;
+                    } else {
+                        // Insert new score
+                        EvalScore score = new EvalScore();
+                        score.setStudentId(student.getId());
+                        score.setCourseId(courseId);
+                        score.setTeacherId(teacherId);
+                        score.setDimensionId(dimensionId);
+                        score.setScore(BigDecimal.valueOf(entry.getValue()));
+                        score.setEvalDate(new Date());
+                        evalScoreService.save(score);
+                        importCount++;
+                    }
                 }
             }
 
-            if (!scoreList.isEmpty()) {
-                evalScoreService.saveBatch(scoreList);
+            StringBuilder msg = new StringBuilder();
+            msg.append("导入完成：新增").append(importCount).append("条，更新").append(updateCount).append("条");
+            if (!skippedStudents.isEmpty()) {
+                msg.append("。未找到学号：").append(String.join("、", skippedStudents));
             }
-            return Result.success("导入成功，共导入" + scoreList.size() + "条记录", null);
+            return Result.success(msg.toString(), null);
         } catch (Exception e) {
             return Result.error("导入失败：" + e.getMessage());
         }

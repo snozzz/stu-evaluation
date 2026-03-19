@@ -22,7 +22,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70" :index="indexMethod"></el-table-column>
         <el-table-column prop="name" label="班级名" min-width="150"></el-table-column>
         <el-table-column prop="college" label="学院" min-width="150"></el-table-column>
         <el-table-column prop="major" label="专业" min-width="150"></el-table-column>
@@ -110,6 +110,9 @@ export default {
     this.fetchData()
   },
   methods: {
+    indexMethod(index) {
+      return (this.currentPage - 1) * this.pageSize + index + 1
+    },
     async fetchData() {
       try {
         const res = await getClassList({

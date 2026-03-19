@@ -13,7 +13,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70" :index="indexMethod"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip></el-table-column>
         <el-table-column prop="publisherId" label="发布者" width="100"></el-table-column>
         <el-table-column prop="isTop" label="置顶" width="90">
@@ -121,6 +121,9 @@ export default {
     this.fetchData()
   },
   methods: {
+    indexMethod(index) {
+      return (this.currentPage - 1) * this.pageSize + index + 1
+    },
     async fetchData() {
       try {
         const res = await getAnnouncements({ page: this.currentPage, size: this.pageSize })

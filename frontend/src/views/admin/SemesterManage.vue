@@ -13,7 +13,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70"></el-table-column>
         <el-table-column prop="name" label="学期名" min-width="200"></el-table-column>
         <el-table-column prop="startDate" label="开始日期" width="150">
           <template slot-scope="scope">

@@ -22,7 +22,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70" :index="indexMethod"></el-table-column>
         <el-table-column prop="name" label="课程名" min-width="150"></el-table-column>
         <el-table-column prop="code" label="课程代码" width="130"></el-table-column>
         <el-table-column prop="semesterId" label="学期" width="160">
@@ -122,6 +122,9 @@ export default {
     this.fetchSemesters()
   },
   methods: {
+    indexMethod(index) {
+      return (this.currentPage - 1) * this.pageSize + index + 1
+    },
     async fetchData() {
       try {
         const res = await getCourseList({

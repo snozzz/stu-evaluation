@@ -13,7 +13,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70"></el-table-column>
         <el-table-column prop="name" label="维度名" min-width="150"></el-table-column>
         <el-table-column prop="description" label="描述" min-width="250" show-overflow-tooltip></el-table-column>
         <el-table-column prop="sortOrder" label="排序" width="100"></el-table-column>

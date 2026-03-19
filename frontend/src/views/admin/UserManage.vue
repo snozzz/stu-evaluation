@@ -34,7 +34,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70" :index="indexMethod"></el-table-column>
         <el-table-column label="头像" width="70" align="center">
           <template slot-scope="scope">
             <el-avatar :size="36" :src="scope.row.avatar" icon="el-icon-user-solid"></el-avatar>
@@ -167,6 +167,9 @@ export default {
     this.fetchData()
   },
   methods: {
+    indexMethod(index) {
+      return (this.currentPage - 1) * this.pageSize + index + 1
+    },
     async fetchData() {
       try {
         const res = await getUserList({

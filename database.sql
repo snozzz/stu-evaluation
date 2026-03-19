@@ -363,9 +363,9 @@ INSERT INTO semester (name, start_date, end_date, is_current) VALUES
 --   admin123 → $2b$10$hrh229ScwJa8jLnu8EGSXOIBmWXHGxjRQp3HD2sRH8LrmyazPG7y.
 --   123456   → $2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2
 INSERT INTO sys_user (username, password, real_name, role, college, major, class_name, student_no) VALUES
-  ('admin',    '$2b$10$hrh229ScwJa8jLnu8EGSXOIBmWXHGxjRQp3HD2sRH8LrmyazPG7y.', '系统管理员', 'ADMIN',   NULL,         NULL,               NULL,       NULL),
-  ('teacher1', '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '张老师',     'TEACHER', '计算机学院', NULL,               NULL,       NULL),
-  ('teacher2', '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '李老师',     'TEACHER', '数学学院',   NULL,               NULL,       NULL),
+  ('admin',    '$2b$10$hrh229ScwJa8jLnu8EGSXOIBmWXHGxjRQp3HD2sRH8LrmyazPG7y.', '系统管理员', 'ADMIN',   NULL,         NULL,               NULL,       'admin'),
+  ('teacher1', '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '张老师',     'TEACHER', '计算机学院', NULL,               NULL,       'T001'),
+  ('teacher2', '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '李老师',     'TEACHER', '数学学院',   NULL,               NULL,       'T002'),
   ('stu001',   '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '王明',       'STUDENT', '计算机学院', '计算机科学与技术', '计科2301', '2023001'),
   ('stu002',   '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '刘芳',       'STUDENT', '计算机学院', '计算机科学与技术', '计科2301', '2023002'),
   ('stu003',   '$2b$10$hLR2EEXoy8gt5E0wIxVCZujuSPW0V0Jc.kEyp/0NakLZ8YprqWdy2', '赵强',       'STUDENT', '计算机学院', '软件工程',         '软工2301', '2023003'),

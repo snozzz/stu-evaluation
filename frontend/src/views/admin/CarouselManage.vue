@@ -13,7 +13,7 @@
         style="width: 100%"
         stripe
       >
-        <el-table-column prop="id" label="ID" width="70"></el-table-column>
+        <el-table-column type="index" label="序号" width="70"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="150"></el-table-column>
         <el-table-column prop="imageUrl" label="图片预览" width="140">
           <template slot-scope="scope">

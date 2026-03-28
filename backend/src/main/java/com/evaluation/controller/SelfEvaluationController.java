@@ -24,13 +24,13 @@ public class SelfEvaluationController {
 
     @PostMapping("/save")
     public Result<?> save(@RequestBody SelfEvaluation selfEvaluation) {
-        boolean saved = selfEvaluationService.save(selfEvaluation);
+        boolean saved = selfEvaluationService.saveOrUpdateByBizKey(selfEvaluation);
         return saved ? Result.success() : Result.error("保存失败");
     }
 
     @PostMapping("/batch")
     public Result<?> saveBatch(@RequestBody List<SelfEvaluation> selfEvaluations) {
-        boolean saved = selfEvaluationService.saveBatch(selfEvaluations);
+        boolean saved = selfEvaluationService.saveOrUpdateBatchByBizKey(selfEvaluations);
         return saved ? Result.success() : Result.error("批量保存失败");
     }
 }

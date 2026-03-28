@@ -58,21 +58,10 @@
           </div>
         </div>
 
-        <div class="eval-form-item">
-          <label class="form-label">评价说明</label>
-          <el-input
-            type="textarea"
-            v-model="evalForm[dim.id].comment"
-            :rows="3"
-            placeholder="请输入你对该维度的自我评价说明..."
-            class="eval-textarea"
-          ></el-input>
-        </div>
-
         <!-- Show existing eval info -->
         <div v-if="existingEvals[dim.id]" class="existing-eval">
           <i class="el-icon-time"></i>
-          上次提交: {{ existingEvals[dim.id].updateTime || existingEvals[dim.id].createTime }}
+          上次提交: {{ formatDateTime(existingEvals[dim.id].updateTime || existingEvals[dim.id].createTime) }}
         </div>
       </div>
 
@@ -156,7 +145,8 @@ export default {
         let existingList = []
         if (evalRes.data.code === 200) {
           const ed = evalRes.data.data
-          existingList = Array.isArray(ed) ? ed : (ed.records || [])
+          const rawList = Array.isArray(ed) ? ed : (ed.records || [])
+          existingList = this.pickLatestSelfEvals(rawList)
         }
 
         // Build form
@@ -167,8 +157,7 @@ export default {
             e => e.dimensionId === dim.id || e.dimensionName === (dim.name || dim.dimensionName)
           )
           form[dim.id] = {
-            score: found ? (found.score || found.selfScore || 0) : 0,
-            comment: found ? (found.comment || found.content || '') : ''
+            score: found ? (found.score || found.selfScore || 0) : 0
           }
           if (found) {
             existing[dim.id] = found
@@ -194,8 +183,7 @@ export default {
           courseId: this.selectedCourseId,
           studentId: this.userId,
           dimensionId: dim.id,
-          score: item ? item.score : 0,
-          comment: item ? item.comment : ''
+          score: item ? item.score : 0
         })
       }
 
@@ -214,7 +202,7 @@ export default {
         if (res && res.data.code === 200) {
           this.$message.success('自评保存成功')
           // Refresh existing data
-          this.handleCourseChange(this.selectedCourseId)
+          await this.handleCourseChange(this.selectedCourseId)
         } else {
           this.$message.error(res?.data?.msg || '保存失败')
         }
@@ -224,6 +212,41 @@ export default {
       } finally {
         this.saving = false
       }
+    },
+    formatDateTime(value) {
+      if (!value) return '-'
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) return value
+
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    },
+    pickLatestSelfEvals(list) {
+      const latestMap = new Map()
+      ;(list || []).forEach(item => {
+        if (!item || item.dimensionId == null) return
+
+        const current = latestMap.get(item.dimensionId)
+        if (!current || this.compareSelfEvalPriority(item, current) > 0) {
+          latestMap.set(item.dimensionId, item)
+        }
+      })
+      return Array.from(latestMap.values())
+    },
+    compareSelfEvalPriority(a, b) {
+      const aTime = new Date(a.updateTime || a.createTime || 0).getTime() || 0
+      const bTime = new Date(b.updateTime || b.createTime || 0).getTime() || 0
+      if (aTime !== bTime) return aTime - bTime
+
+      const aId = Number(a.id || 0)
+      const bId = Number(b.id || 0)
+      return aId - bId
     }
   }
 }

@@ -219,7 +219,8 @@ export default {
         }
         if (selfRes.data.code === 200) {
           const se = selfRes.data.data
-          this.selfEvals = Array.isArray(se) ? se : (se.records || [])
+          const rawList = Array.isArray(se) ? se : (se.records || [])
+          this.selfEvals = this.pickLatestSelfEvals(rawList)
         }
         if (commentRes.data.code === 200) {
           const cd = commentRes.data.data
@@ -355,6 +356,27 @@ export default {
 
       this.barChart.setOption(option)
       window.addEventListener('resize', this.handleResize)
+    },
+    pickLatestSelfEvals(list) {
+      const latestMap = new Map()
+      ;(list || []).forEach(item => {
+        if (!item || item.dimensionId == null) return
+
+        const current = latestMap.get(item.dimensionId)
+        if (!current || this.compareSelfEvalPriority(item, current) > 0) {
+          latestMap.set(item.dimensionId, item)
+        }
+      })
+      return Array.from(latestMap.values())
+    },
+    compareSelfEvalPriority(a, b) {
+      const aTime = new Date(a.updateTime || a.createTime || 0).getTime() || 0
+      const bTime = new Date(b.updateTime || b.createTime || 0).getTime() || 0
+      if (aTime !== bTime) return aTime - bTime
+
+      const aId = Number(a.id || 0)
+      const bId = Number(b.id || 0)
+      return aId - bId
     }
   }
 }

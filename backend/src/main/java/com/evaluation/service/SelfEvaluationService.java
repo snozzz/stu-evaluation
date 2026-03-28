@@ -8,4 +8,8 @@ import java.util.List;
 public interface SelfEvaluationService extends IService<SelfEvaluation> {
 
     List<SelfEvaluation> getByStudentAndCourse(Long studentId, Long courseId);
+
+    boolean saveOrUpdateByBizKey(SelfEvaluation selfEvaluation);
+
+    boolean saveOrUpdateBatchByBizKey(List<SelfEvaluation> selfEvaluations);
 }

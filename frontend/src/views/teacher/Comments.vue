@@ -148,7 +148,7 @@
       >
         <el-table-column label="学生" width="120">
           <template slot-scope="scope">
-            {{ getStudentName(scope.row.studentId) }}
+            {{ scope.row.studentName || getStudentName(scope.row.studentId) }}
           </template>
         </el-table-column>
         <el-table-column prop="comment" label="评语" show-overflow-tooltip></el-table-column>
@@ -193,6 +193,7 @@ export default {
       courseList: [],
       classList: [],
       studentList: [],
+      courseStudents: [],
       selectedCourse: null,
       selectedClass: null,
       selectedStudent: null,
@@ -224,6 +225,20 @@ export default {
     currentStudentName() {
       const stu = this.studentList.find(s => s.id === this.selectedStudent)
       return stu ? stu.realName : ''
+    },
+    courseStudentMap() {
+      const map = new Map()
+      ;(this.courseStudents || []).forEach(stu => {
+        if (stu && stu.id != null && !map.has(stu.id)) {
+          map.set(stu.id, stu)
+        }
+      })
+      ;(this.studentList || []).forEach(stu => {
+        if (stu && stu.id != null && !map.has(stu.id)) {
+          map.set(stu.id, stu)
+        }
+      })
+      return map
     }
   },
   created() {
@@ -253,8 +268,14 @@ export default {
       this.selectedClass = null
       this.selectedStudent = null
       this.studentList = []
+      this.courseStudents = []
       this.resetComment()
-      this.loadCommentHistory()
+      if (this.selectedCourse) {
+        this.loadCourseStudents()
+        this.loadCommentHistory()
+      } else {
+        this.commentHistory = []
+      }
     },
     async handleClassChange() {
       this.selectedStudent = null
@@ -281,6 +302,43 @@ export default {
       } catch (e) {
         console.error('Load students error:', e)
         this.studentList = []
+      }
+    },
+    async loadCourseStudents() {
+      if (!this.selectedCourse) {
+        this.courseStudents = []
+        return
+      }
+
+      const classIds = [...new Set(
+        this.bindings
+          .filter(b => b.courseId === this.selectedCourse)
+          .map(b => b.classId)
+          .filter(id => id != null)
+      )]
+
+      if (!classIds.length) {
+        this.courseStudents = []
+        return
+      }
+
+      try {
+        const results = await Promise.all(classIds.map(classId => getStudentsByClass(classId)))
+        const merged = []
+        const seen = new Set()
+        results.forEach(res => {
+          const students = (res.data && res.data.data) || []
+          students.forEach(stu => {
+            if (stu && stu.id != null && !seen.has(stu.id)) {
+              seen.add(stu.id)
+              merged.push(stu)
+            }
+          })
+        })
+        this.courseStudents = merged
+      } catch (e) {
+        console.error('Load course students error:', e)
+        this.courseStudents = []
       }
     },
     async loadExistingComment() {
@@ -433,8 +491,8 @@ export default {
       }
     },
     getStudentName(studentId) {
-      const stu = this.studentList.find(s => s.id === studentId)
-      return stu ? stu.realName : ('学生ID: ' + studentId)
+      const stu = this.courseStudentMap.get(studentId)
+      return stu && stu.realName ? stu.realName : '未知学生'
     },
     formatDate(dateStr) {
       if (!dateStr) return '-'

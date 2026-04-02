@@ -64,7 +64,7 @@
     <!-- Submissions Dialog -->
     <el-dialog title="学生提交情况" :visible.sync="subDialogVisible" width="800px">
       <el-table :data="submissions" style="width: 100%" v-loading="subLoading">
-        <el-table-column prop="studentId" label="学生ID" width="100"></el-table-column>
+        <el-table-column prop="studentNameText" label="学生姓名" width="120"></el-table-column>
         <el-table-column prop="content" label="提交内容" min-width="200" show-overflow-tooltip></el-table-column>
         <el-table-column label="附件" width="100">
           <template slot-scope="scope">
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { getAssignmentList, createAssignment, deleteAssignment, getAssignmentSubmissions, gradeAssignment, getBindings, getCourseList } from '../../api'
+import { getAssignmentList, createAssignment, deleteAssignment, getAssignmentSubmissions, gradeAssignment, getBindings, getCourseList, getUserList } from '../../api'
 
 export default {
   name: 'TeacherAssignments',
@@ -139,7 +139,8 @@ export default {
         id: null,
         score: 0,
         feedback: ''
-      }
+      },
+      studentNameMap: {}
     }
   },
   computed: {
@@ -149,8 +150,31 @@ export default {
   },
   created() {
     this.fetchCourses()
+    this.fetchStudentMap()
   },
   methods: {
+    async fetchStudentMap() {
+      try {
+        const res = await getUserList({ role: 'STUDENT', page: 1, size: 1000 })
+        if (res.data.code === 200) {
+          const pageData = res.data.data || {}
+          const students = pageData.records || []
+          const studentNameMap = {}
+          students.forEach(student => {
+            const name = student.realName || student.nickname
+            if (student.id != null && name) {
+              studentNameMap[student.id] = name
+            }
+          })
+          this.studentNameMap = studentNameMap
+          if (this.submissions.length > 0) {
+            this.submissions = this.submissions.map(item => this.normalizeSubmission(item))
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch students', e)
+      }
+    },
     async fetchCourses() {
       try {
         const [bindRes, courseRes] = await Promise.all([
@@ -285,6 +309,7 @@ export default {
     normalizeSubmission(item) {
       return {
         ...item,
+        studentNameText: item.studentName || this.studentNameMap[item.studentId] || '未知学生',
         submitTimeText: this.formatDateTime(item.submitTime)
       }
     },

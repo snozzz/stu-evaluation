@@ -3,8 +3,10 @@ package com.evaluation.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.evaluation.entity.Assignment;
 import com.evaluation.entity.AssignmentSubmission;
+import com.evaluation.entity.SysUser;
 import com.evaluation.service.AssignmentService;
 import com.evaluation.service.AssignmentSubmissionService;
+import com.evaluation.service.SysUserService;
 import com.evaluation.util.IdResetUtil;
 import com.evaluation.util.Result;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,9 @@ public class AssignmentController {
 
     @Resource
     private AssignmentSubmissionService assignmentSubmissionService;
+
+    @Resource
+    private SysUserService sysUserService;
 
     @Resource
     private IdResetUtil idResetUtil;
@@ -90,6 +95,29 @@ public class AssignmentController {
         wrapper.eq(AssignmentSubmission::getAssignmentId, assignmentId);
         wrapper.orderByDesc(AssignmentSubmission::getSubmitTime);
         List<AssignmentSubmission> list = assignmentSubmissionService.list(wrapper);
+
+        Set<Long> studentIds = new HashSet<>();
+        for (AssignmentSubmission submission : list) {
+            if (submission.getStudentId() != null) {
+                studentIds.add(submission.getStudentId());
+            }
+        }
+
+        Map<Long, String> studentNameMap = new HashMap<>();
+        if (!studentIds.isEmpty()) {
+            List<SysUser> students = sysUserService.listByIds(studentIds);
+            for (SysUser student : students) {
+                String name = student.getRealName() != null && !student.getRealName().trim().isEmpty()
+                        ? student.getRealName()
+                        : student.getNickname();
+                studentNameMap.put(student.getId(), name != null && !name.trim().isEmpty() ? name : "未知学生");
+            }
+        }
+
+        for (AssignmentSubmission submission : list) {
+            submission.setStudentName(studentNameMap.getOrDefault(submission.getStudentId(), "未知学生"));
+        }
+
         return Result.success(list);
     }
 

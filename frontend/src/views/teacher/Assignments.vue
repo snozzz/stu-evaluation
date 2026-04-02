@@ -21,8 +21,8 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="dueDate" label="截止日期" width="160"></el-table-column>
-      <el-table-column prop="createTime" label="发布时间" width="160"></el-table-column>
+      <el-table-column prop="dueDateText" label="截止日期" width="180"></el-table-column>
+      <el-table-column prop="createTimeText" label="发布时间" width="180"></el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="viewSubmissions(scope.row)">查看提交</el-button>
@@ -72,7 +72,7 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="submitTime" label="提交时间" width="160"></el-table-column>
+        <el-table-column prop="submitTimeText" label="提交时间" width="180"></el-table-column>
         <el-table-column label="成绩" width="100">
           <template slot-scope="scope">
             <span v-if="scope.row.status === 'GRADED'">{{ scope.row.score }}</span>
@@ -189,7 +189,7 @@ export default {
       try {
         const res = await getAssignmentList({ courseId: this.selectedCourse })
         if (res.data.code === 200) {
-          this.assignments = res.data.data
+          this.assignments = (res.data.data || []).map(item => this.normalizeAssignment(item))
         }
       } finally {
         this.loading = false
@@ -240,7 +240,7 @@ export default {
       try {
         const res = await getAssignmentSubmissions({ assignmentId: row.id })
         if (res.data.code === 200) {
-          this.submissions = res.data.data
+          this.submissions = (res.data.data || []).map(item => this.normalizeSubmission(item))
         }
       } finally {
         this.subLoading = false
@@ -274,6 +274,33 @@ export default {
       } catch (e) {
         this.$message.error('批改失败')
       }
+    },
+    normalizeAssignment(item) {
+      return {
+        ...item,
+        dueDateText: this.formatDateTime(item.dueDate),
+        createTimeText: this.formatDateTime(item.createTime)
+      }
+    },
+    normalizeSubmission(item) {
+      return {
+        ...item,
+        submitTimeText: this.formatDateTime(item.submitTime)
+      }
+    },
+    formatDateTime(value) {
+      if (!value) return '-'
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) {
+        return String(value).replace('T', ' ').replace(/\.\d+/, '')
+      }
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hour = String(date.getHours()).padStart(2, '0')
+      const minute = String(date.getMinutes()).padStart(2, '0')
+      const second = String(date.getSeconds()).padStart(2, '0')
+      return `${year}/${month}/${day} ${hour}:${minute}:${second}`
     }
   }
 }

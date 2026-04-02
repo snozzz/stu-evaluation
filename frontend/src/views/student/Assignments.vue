@@ -20,7 +20,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="dueDate" label="截止日期" width="160"></el-table-column>
+      <el-table-column prop="dueDateText" label="截止日期" width="180"></el-table-column>
       <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
           <el-tag size="small" :type="statusType(scope.row)">
@@ -153,7 +153,7 @@ export default {
         }
         const res = await getStudentAssignments(params)
         if (res.data.code === 200) {
-          this.assignments = res.data.data || []
+          this.assignments = (res.data.data || []).map(item => this.normalizeAssignment(item))
         }
       } finally {
         this.loading = false
@@ -193,6 +193,26 @@ export default {
     openViewDialog(row) {
       this.currentView = row
       this.viewDialogVisible = true
+    },
+    normalizeAssignment(item) {
+      return {
+        ...item,
+        dueDateText: this.formatDateTime(item.dueDate)
+      }
+    },
+    formatDateTime(value) {
+      if (!value) return '-'
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) {
+        return String(value).replace('T', ' ').replace(/\.\d+/, '')
+      }
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hour = String(date.getHours()).padStart(2, '0')
+      const minute = String(date.getMinutes()).padStart(2, '0')
+      const second = String(date.getSeconds()).padStart(2, '0')
+      return `${year}/${month}/${day} ${hour}:${minute}:${second}`
     }
   }
 }

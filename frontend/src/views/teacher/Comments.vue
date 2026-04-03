@@ -111,20 +111,11 @@
       <div class="comment-actions">
         <el-button
           type="primary"
-          icon="el-icon-check"
+          icon="el-icon-s-promotion"
           @click="handleSaveComment"
           :loading="saveLoading"
         >
-          保存评语
-        </el-button>
-        <el-button
-          type="success"
-          icon="el-icon-s-promotion"
-          @click="handlePublishComment"
-          :loading="publishLoading"
-          :disabled="!currentComment.id"
-        >
-          发布评语
+          保存并发送
         </el-button>
       </div>
     </div>
@@ -177,7 +168,6 @@ import {
   getBindings,
   getComments,
   saveComment,
-  publishComment,
   getCourseList,
   getClassList,
   getStudentsByClass
@@ -199,7 +189,6 @@ export default {
       selectedStudent: null,
       commentText: defaultCommentText,
       saveLoading: false,
-      publishLoading: false,
       publishAllLoading: false,
       currentComment: {
         id: null,
@@ -398,38 +387,20 @@ export default {
           courseId: this.selectedCourse,
           teacherId: teacherId,
           comment: this.commentText.trim(),
-          isPublished: 0
+          isPublished: 1
         }
         if (this.currentComment.id) {
           data.id = this.currentComment.id
         }
 
         await saveComment(data)
-        this.$message.success('评语保存成功')
+        this.$message.success('评语已保存并发送')
         await this.loadExistingComment()
         this.loadCommentHistory()
       } catch (e) {
-        this.$message.error('保存失败')
+        this.$message.error('发送失败')
       } finally {
         this.saveLoading = false
-      }
-    },
-    async handlePublishComment() {
-      if (!this.currentComment.id) {
-        this.$message.warning('请先保存评语')
-        return
-      }
-
-      this.publishLoading = true
-      try {
-        await publishComment(this.currentComment.id)
-        this.$message.success('评语已发布，学生可以查看')
-        this.currentComment.isPublished = 1
-        this.loadCommentHistory()
-      } catch (e) {
-        this.$message.error('发布失败')
-      } finally {
-        this.publishLoading = false
       }
     },
     async handlePublishAllComments() {
